@@ -1,0 +1,76 @@
+{
+  "sysname": "raspicontrol.js",
+  "port": "9009",
+  "apikeys": [
+    "foo12",
+    "bar34"
+  ],
+  "devices": [
+     {
+      "id": "QyMkeHhd",
+      "name": "lamp01",
+      "port": 1,
+      "icon": "fa-sun-o",
+      "color": "#FFFF00",
+    },
+     
+    {
+      "id": "X17ylBhu",
+      "name": "lamp02",
+      "port": 2,
+      "icon": "fa-sun-o",
+      "color": "#FFFF00",
+    },
+    {
+      "id": "mJNkgB3u",
+      "name": "water",
+      "port": 3,
+      "icon": "fa-plug",
+      "color": "#1E90FF",
+    },
+  ],
+  switches: [
+    {
+      id: "mkeEkeBn_",
+      device: "QyMkeHhd",
+      type: "on",
+      time: "08:00",
+      length: false
+    },
+    {
+      id: "Qy-PmrhO",
+      device: "QyMkeHhd",
+      type: "off",
+      time: "19:00",
+      length: false
+    },
+    {
+      id: "QJebv7H2_",
+      device: "X17ylBhu",
+      type: "on",
+      time: "08:30",
+      length: false
+    },
+    {
+      id: "QyGwQr2u",
+      device: "X17ylBhu",
+      type: "off",
+      time: "18:30",
+      length: false
+    },
+    {
+      id: "mJeMPmShO",
+      device: "X17ylBhu",
+      type: "on",
+      time: "07:50",
+      length: 40
+    },
+    {
+      id: "mkZzv7rnu",
+      device: "X17ylBhu",
+      type: "off",
+      time: "16:30",
+      length: 50
+    },
+  ]
+}
