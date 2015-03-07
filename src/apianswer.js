@@ -17,6 +17,7 @@ module.exports = {
 	300: "unknown error",
 	301: "port must be unique",
 	302: "port must be a number",
+	303: "validation error",
 	404: "not found",
 	405: "device does not exists",
 	406: "switch does not exists",

@@ -4,35 +4,87 @@ var app = express();
 var router = express.Router();
 var answer = rekuire('src/apianswer');
 var config = rekuire('src/config');
-var shortid = require('shortid');
 
-config.init()
 
- 
-router.get('/switch', function(req, res, next) {
-  var answer = api.get_template();
-  answer.statuscode = 200;
-  answer.data = config.config.devices;
-  res.json(answer);
+
+// list
+router.get('/', function(req, res, next) {
+  answer.new();
+  answer.success();
+  answer.data(config.data.switch);
+  res.json( answer.get() );
 });
 
-router.get('/switch/:id', function(req, res, next) {
-  var answer = api.get_template();
-  var sw = config.query( "switches[id="+req.params.id+"]" )
-  if (sw == null ){
-	answer.statuscode = 406;
-	res.json(answer);
+
+// single info
+router.get('/:id', function(req, res, next) {
+  answer.new();
+  var sw = config.switch.getbyid( req.params.id  );
+  if (sw.id != req.params.id ){
+	  answer.error();
+	  answer.status(405);
   }
   else {
-	answer.error=false;
-	answer.success=true;
-	answer.statuscode = 200;
-	answer.data = [ sw ];
-	res.json(answer);
+	  answer.success();
+	  answer.data( [ sw ] );
   }
+  res.json( answer.get() );
 });
 
+// new switch
+router.post('/', function(req, res, next) {
+  answer.new();
+  ret = config.switch.new( req.body )
+  if (ret.success){
+    config.write()
+    answer.success();
+    answer.data( ret.instance );
+  }
+  else {
+    answer.error();
+    answer.status(303);
+    answer.data( ret.errors );
+  }
+  res.json(answer.get());
+});
+
+// update switch
+router.put('/:id', function(req, res, next) {
+  answer.new()
+  req.body.id=req.params.id;
+  ret = config.switch.update( req.body );
+  if (ret.success){
+    config.write()
+    answer.success();
+    answer.data( ret.instance );
+  }
+  else {
+    answer.error();
+    answer.status(303);
+    answer.data( ret.errors );
+  }
+  res.json( answer.get() );  
+})
+
+// delete switch
+router.delete('/:id', function(req, res, next) {
+  answer.new()
+  var ret = config.switch.delete(req.params.id);
+  if (ret.success){
+    config.write()
+    answer.success();
+    answer.data( ret.instance );
+  }
+  else {
+    answer.error();
+    answer.status(303);
+    answer.data( ret.errors );
+  }
+  res.json( answer.get() );    
+})
 
 
 
-module.exports = app,router
+
+
+module.exports = router

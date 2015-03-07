@@ -4,31 +4,30 @@ var app = express();
 var router = express.Router();
 var answer = rekuire('src/apianswer');
 var config = rekuire('src/config');
-var shortid = require('shortid');
 
 
 config.init()
-
 
  // device list
 router.get('/', function(req, res, next) {
   answer.new();
   answer.success();
-  answer.data(config.config.devices);
+  answer.data(config.data.device);
   res.json( answer.get() );
 });
+
 
 // single device info
 router.get('/:id', function(req, res, next) {
   answer.new();
-  var device = config.filter( config.config.devices, { id: req.params.id}  );
-  if (device === false ){
-	answer.error();
-	answer.status(405);
+  var device = config.device.getbyid( req.params.id  );
+  if (device.id != req.params.id ){
+	  answer.error();
+	  answer.status(405);
   }
   else {
-	answer.success();
-	answer.data( [ device ] );
+	  answer.success();
+	  answer.data( [ device ] );
   }
   res.json( answer.get() );
 });
@@ -36,74 +35,57 @@ router.get('/:id', function(req, res, next) {
 // new device
 router.post('/', function(req, res, next) {
   answer.new();
-  
-  var port = parseInt(req.body.port)
-  
-  // check if port allready configured
-  var error = config.filter( config.config.devices, { port: port }  );  
-  if (error) status = 301;
-  
-  // ckeck if given port is a number
-  if ( isNaN(port) ){
-	 var error = true;
-	 var status = 302; 
-  }
-  
-  if (error === false){
-    device={};
-    device.id = shortid.generate();
-    device.name=req.body.name;
-    device.port=port;
-    device.icon=req.body.icon;
-    device.color=req.body.color;
-    config.config.devices.push(device);
-    config.write();
+  req.body.port=parseInt(req.body.port);
+  ret = config.device.new( req.body )
+  if (ret.success){
+    config.write()
     answer.success();
-    answer.data( [ device  ] );
-  } 
-  else {
-	 answer.status(status);
-	 answer.error();
+    answer.data( ret.instance );
   }
+  else {
+    answer.error();
+    answer.status(303);
+    answer.data( ret.errors );
+  }
+
   res.json(answer.get());
 });
 
 // update device
 router.put('/:id', function(req, res, next) {
-  console.log('update');
   answer.new()
-  var device = config.filter( config.config.devices, { id: req.params.id }  );
-  if (device === false ){
-	answer.error();
-	answer.status(405);
+  req.body.port=parseInt(req.body.port);
+  req.body.id=req.params.id;
+  ret = config.device.update( req.body );
+  if (ret.success){
+    config.write()
+    answer.success();
+    answer.data( ret.instance );
   }
   else {
-    req.params.port = parseInt(req.params.port)
-    device.name=req.body.name;
-    device.port=req.body.port;
-    device.icon=req.body.icon;
-    device.color=req.body.color;
-    // config.devices.[key]=device
-    answer.success();
+    answer.error();
+    answer.status(303);
+    answer.data( ret.errors );
   }
-  answer.data( [ req.body ] );
   res.json( answer.get() );  
+
 })
+
+
 
 // delete device
 router.delete('/:id', function(req, res, next) {
   answer.new()
-  var device = config.filter( config.config.devices, { id: req.params.id}  );
-  if (device === false ){
-	answer.error();
-	answer.status(405);
+  var ret = config.device.delete(req.params.id);
+  if (ret.success){
+    config.write()
+    answer.success();
+    answer.data( ret.instance );
   }
   else {
-    answer.success();
-    var re=config.remove(config.config.devices,"id",req.body.id);
-    config.config.devices=re;
-    config.write();   
-    answer.data( [ {id:req.body.id} ] );
+    answer.error();
+    answer.status(303);
+    answer.data( ret.errors );
   }
   res.json( answer.get() );    
 })

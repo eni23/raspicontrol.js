@@ -6,7 +6,7 @@
     "bar34"
   ],
   "device": [
-     {
+    {
       "id": "QyMkeHhd",
       "name": "lamp01",
       "port": 1,
@@ -22,13 +22,20 @@
     },
     {
       "id": "mJNkgB3u",
-      "name": "water",
       "port": 3,
+      "name": "new-water",
       "icon": "fa-plug",
       "color": "#1E90FF"
+    },
+    {
+      "name": "mytest",
+      "port": 8,
+      "icon": "none",
+      "color": "blue",
+      "id": "m1Psvw6u"
     }
   ],
-  "switches": [
+  "switch": [
     {
       "id": "mkeEkeBn_",
       "device": "QyMkeHhd",
@@ -70,6 +77,20 @@
       "type": "off",
       "time": "16:30",
       "duration": 50
+    },
+    {
+      "device": "",
+      "type": "off",
+      "time": "",
+      "duration": "0s",
+      "id": "Q1fFKOad"
+    },
+    {
+      "id": "XyYMq_Td",
+      "device": "m1Psvw6u",
+      "type": "on",
+      "time": "11:44",
+      "duration": "0"
     }
   ]
 }

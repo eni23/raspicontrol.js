@@ -6,6 +6,7 @@
 		<link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css">
 		<link rel="stylesheet" href="/lib/bootstrap/css/bootstrap-theme.min.css">
 		<link rel='stylesheet' href='/css/style.css' />
+		<title>raspicontrol.js - API-Console</title>
 		<style>
 			pre.logger {
 				width:100%;
@@ -55,23 +56,24 @@
 		<div class="well">
 			<b>switch</b>
 			<p>
-				<button class="btn btn-primary">list all</button>
-				<button class="btn btn-primary">list single</button>
-				<button class="btn btn-primary">new</button>
-				<button class="btn btn-primary">update</button>
-				<button class="btn btn-primary">delete</button>
+				<button  id="s-listall" class="btn btn-primary">list all</button>
+				<button  id="s-listone" class="btn btn-primary">list single</button>
+				<button  id="s-new" class="btn btn-primary">new</button>
+				<button  id="s-update" class="btn btn-primary">update</button>
+				<button  id="s-delete" class="btn btn-primary">delete</button>
 				
 			</p>
 			<p>
-				<input type="text" class="form-control" placeholder="id" />
-				<input type="text" class="form-control" placeholder="device" />
-				type: <select>
+				<input id="sv-id" type="text" class="form-control" placeholder="id" />
+				<input id="sv-device" type="text" class="form-control" placeholder="device" />
+				type: <select id="sv-type">
 					<option>on</option>
 					<option>off</option>
 					<option>duration</option>
+					<option>invalid</option>
 				</select>				
-				<input type="text" class="form-control" placeholder="time" />
-				<input type="text" class="form-control" placeholder="duration" />
+				<input id="sv-time" type="text" class="form-control" placeholder="time" />
+				<input id="sv-duration" type="text" class="form-control" placeholder="duration" />
 			</p>
 		</div>	
 		
@@ -177,6 +179,61 @@
 					var id=ival("dv-id");
 					api.setkey( ival("v-key") );
 					api.call( { url: "device/"+id, method: "delete", data: { id:id } }, function(res){
+						logger_json(res)
+					});
+				});
+				
+				
+				// switch: listall
+				$("#s-listall").click(function(){
+					logger("list all devices:");
+					api.setkey( ival("v-key") );
+					api.call( { url: "switch", method: "get" }, function(res){
+						logger_json(res)
+					});
+				});
+				
+				// switch: list single
+				$("#s-listone").click(function(){
+					var id=ival("sv-id");
+					logger("list single device, id:"+id);
+					api.setkey( ival("v-key") );
+					api.call( { url: "switch/"+id, method: "get" }, function(res){
+						logger_json(res)
+					});
+				});
+				
+				// new switch
+				$("#s-new").click(function(){
+					var device=ival("sv-device");
+					var type=ival("sv-type");
+					var time=ival("sv-time");
+					var duration=ival("sv-duration");
+					api.setkey( ival("v-key") );
+					api.call( { url: "switch", method: "post", data: { device:device, type:type, time:time, duration:duration } }, function(res){
+						logger_json(res)
+					});
+				});
+				
+				// update switch
+				$("#s-update").click(function(){
+					
+					var id=ival("sv-id");
+					var device=ival("sv-device");
+					var type=ival("sv-type");
+					var time=ival("sv-time");
+					var duration=ival("sv-duration");
+					api.setkey( ival("v-key") );
+					api.call( { url: "switch/"+id, method: "put", data: { id:id, device:device, type:type, time:time, duration:duration } }, function(res){
+						logger_json(res)
+					});
+				});
+				
+				// delete switch
+				$("#s-delete").click(function(){
+					var id=ival("sv-id");
+					api.setkey( ival("v-key") );
+					api.call( { url: "switch/"+id, method: "delete", data: { id:id } }, function(res){
 						logger_json(res)
 					});
 				});

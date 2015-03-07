@@ -1,10 +1,23 @@
-var config = require('./src/confignew');
+var config = require('./src/config');
 
 config.init();
 
 //config.device.remove("id","QyMkeHhd");
 
-res=config.device.update( { id: "X17ylBhu", name: 'newname', icon:'fa-newicon' } )
+
+var obj =  {
+      "id": "QJebv7H2_",
+      "device": "X17ylBhu",
+      "type": "on",
+      "time": "08:30",
+      "duration": false
+};
+
+var query1 = { id:"QJebv7H2_" }
+var query2 = [ { id:"QJebv7H2_",}, { id:"Qy-PmrhO" } ]
+var query3 = { type:"on" }
+
+res=config.switch.resolve( query3 )
 console.log(res)
 
-console.log(config.data)
+//console.log(config.data)
