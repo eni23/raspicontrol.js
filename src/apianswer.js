@@ -8,7 +8,7 @@ module.exports = {
     statustext: false,
     error: true,
     success: false,
-    data: false,
+    data: [{}],
     changed: 0,
   },
   

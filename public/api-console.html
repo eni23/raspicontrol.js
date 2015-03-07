@@ -27,8 +27,13 @@
 	<body class="container">
 		
 		
-		<h2>API Console</h2>
+		<h2>API Query</h2>
 		<pre class="logger"></pre>
+		<div class="well">
+			<b>apikey</b>
+			<input id="v-key" type="text" class="form-control" placeholder="api-key" value="bar34" />
+		</div>
+		
 		<div class="well">
 			<b>device</b>
 			<p>
@@ -95,7 +100,15 @@
 			
 			var api = {
 				baseurl: "/api/v1/",
+				apikey: false,
 				call: function( opts, callback ){
+					logger_json(opts)
+					if (typeof opts.data === 'undefined'){
+						 opts.data = {};
+						 opts.data.apikey=false;
+						 
+					}
+					opts.data.apikey = this.apikey;
 					$.ajax({
 						url: this.baseurl+opts.url,
 						type: opts.method,
@@ -104,6 +117,10 @@
 							callback(res);
 						}
 					});
+				},
+				setkey: function(key){
+					logger('setkey '+key);
+					this.apikey=key;
 				}
 			}
 
@@ -114,6 +131,7 @@
 				// device: list all
 				$("#d-listall").click(function(){
 					logger("list all devices:");
+					api.setkey( ival("v-key") );
 					api.call( { url: "device", method: "get" }, function(res){
 						logger_json(res)
 					});
@@ -123,6 +141,7 @@
 				$("#d-listone").click(function(){
 					var id=ival("dv-id");
 					logger("list single device, id:"+id);
+					api.setkey( ival("v-key") );
 					api.call( { url: "device/"+id, method: "get" }, function(res){
 						logger_json(res)
 					});
@@ -134,6 +153,7 @@
 					var port=ival("dv-port");
 					var icon=ival("dv-icon");
 					var color=ival("dv-color");
+					api.setkey( ival("v-key") );
 					api.call( { url: "device", method: "post", data: { name:name, port:port, icon:icon, color:color } }, function(res){
 						logger_json(res)
 					});
@@ -146,6 +166,7 @@
 					var port=ival("dv-port");
 					var icon=ival("dv-icon");
 					var color=ival("dv-color");
+					api.setkey( ival("v-key") );
 					api.call( { url: "device/"+id, method: "put", data: { id:id, name:name, port:port, icon:icon, color:color } }, function(res){
 						logger_json(res)
 					});
@@ -154,6 +175,7 @@
 				// delete device
 				$("#d-delete").click(function(){
 					var id=ival("dv-id");
+					api.setkey( ival("v-key") );
 					api.call( { url: "device/"+id, method: "delete", data: { id:id } }, function(res){
 						logger_json(res)
 					});

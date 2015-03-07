@@ -28,6 +28,31 @@ router.use(function (req, res, next) {
   next();
 });
 
+// global: check for valid api-key
+router.use(function (req, res, next) {
+  var valid = key = false;
+  if ( req.body.apikey != undefined ) key = req.body.apikey
+  if ( req.query.apikey != undefined ) key = req.query.apikey
+  for (var k in config.config.apikeys) {
+	  if (config.config.apikeys[k] == key) valid=true;
+  }
+  if (valid){
+    next();
+  }
+  else {
+    answer.new();
+    answer.error();
+	answer.status(501);
+    res.send( answer.get() );
+  }
+})
+
+
+//app.use("/api/v1/device", require('./api/v1/device') );
+//app.use("/api/v1/switch", require('./api/v1/switch') );
+//app.use("/api/v1/control", require('./api/v1/control') );
+
+
 
 
 /**
@@ -61,21 +86,23 @@ router.get('/device/:id', function(req, res, next) {
 router.post('/device', function(req, res, next) {
   answer.new();
   
+  var port = parseInt(req.body.port)
+  
+  // check if port allready configured
+  var error = config.filter( config.config.devices, { port: port }  );  
+  if (error) status = 301;
+  
   // ckeck if given port is a number
-  if ( isNaN(req.body.port) ){
+  if ( isNaN(port) ){
 	 var error = true;
 	 var status = 302; 
   }
   
-  // check if port allready configured
-  var error = config.filter( config.config.devices, { port: parseInt(req.body.port) }  );  
-  if (error) status = 301;
-
   if (error === false){
     device={};
     device.id = shortid.generate();
     device.name=req.body.name;
-    device.port=parseInt(req.body.port);
+    device.port=port;
     device.icon=req.body.icon;
     device.color=req.body.color;
     config.config.devices.push(device);
