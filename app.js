@@ -9,6 +9,9 @@ var routes = require('./routes/index');
 var app = express();
 
 
+
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -32,7 +35,7 @@ app.use(function(req, res, next) {
     err.status = 404;
     next(err);
 });
-
+/*
 // error handlers
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);
@@ -40,10 +43,11 @@ app.use(function(err, req, res, next) {
     // if api-call, send json 
     var apistr="/api/v1";
     if ( req.url.substring(0, apistr.length) === apistr ) {
-		var api = require('./src/api');
-		var answer = api.get_template();
-		answer.statuscode=err.status;
-		res.json(answer)
+		var answer = require('./src/apianswer');
+		answer.new();
+		answer.status(err.status);
+		answer.error();
+		res.json( answer.get() );
 	} 
 	// otherwise send an html-error
 	else {
@@ -53,7 +57,7 @@ app.use(function(err, req, res, next) {
 		});
 	}
 });
-
+*/
 
 var debug = require('debug')('raspicontrol.js:server');
 var http = require('http');

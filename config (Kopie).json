@@ -6,7 +6,7 @@
     "bar34"
   ],
   "devices": [
-    {
+     {
       "id": "QyMkeHhd",
       "name": "lamp01",
       "port": 1,
@@ -14,60 +14,18 @@
       "color": "#FFFF00"
     },
     {
-      "id": "XkHvB5nu",
-      "name": "fubar",
+      "id": "X17ylBhu",
+      "name": "lamp02",
       "port": 2,
-      "icon": "none",
-      "color": "naaah"
+      "icon": "fa-sun-o",
+      "color": "#FFFF00"
     },
     {
-      "id": "m1LaPc2O",
-      "name": "fubar",
+      "id": "mJNkgB3u",
+      "name": "water",
       "port": 3,
-      "icon": "none",
-      "color": "none"
-    },
-    {
-      "id": "Xk04_53_",
-      "name": "fubar",
-      "port": 2,
-      "icon": "none",
-      "color": "none"
-    },
-    {
-      "id": "mJ-rdqhO",
-      "name": "fubar",
-      "port": 2,
-      "icon": "none",
-      "color": "none"
-    },
-    {
-      "id": "7kB_dq3_",
-      "name": "dvgsdag",
-      "port": 2,
-      "icon": "agdsg",
-      "color": "agfd"
-    },
-    {
-      "id": "X144t53u",
-      "name": "",
-      "port": null,
-      "icon": "",
-      "color": ""
-    },
-    {
-      "id": "71LEYq3d",
-      "name": "",
-      "port": null,
-      "icon": "",
-      "color": ""
-    },
-    {
-      "id": "XJwEYc3_",
-      "name": "",
-      "port": null,
-      "icon": "",
-      "color": ""
+      "icon": "fa-plug",
+      "color": "#1E90FF"
     }
   ],
   "switches": [

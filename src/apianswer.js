@@ -15,6 +15,8 @@ module.exports = {
   errortext: {
 	200: "success",
 	300: "unknown error",
+	301: "port must be unique",
+	302: "port must be a number",
 	404: "not found",
 	405: "device does not exists",
 	406: "switch does not exists",
@@ -35,9 +37,13 @@ module.exports = {
 	  this._answer.statuscode=statuscode;
   },
   
+  data: function(data){
+	  this._answer.data=data;
+	  this.count(data);
+  },
   
   maketext: function(){
-	if (typeof this.errortext[data.statuscode] != undefined) {
+	if (typeof this.errortext[this._answer.statuscode] != undefined) {
 	  this._answer.statustext = this.errortext[this._answer.statuscode];
 	}
   }
@@ -47,7 +53,7 @@ module.exports = {
   },
   
   success: function(){
-	 this._answer.statuscode=statuscode;
+	 this._answer.statuscode=200;
 	 this._answer.error=false;
 	 this._answer.success=true;
   },
