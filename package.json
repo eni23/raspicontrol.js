@@ -12,6 +12,7 @@
     "ejs": "^2.2.4",
     "express": "^4.11.2",
     "json-query": "^1.4.0",
+    "jsonschema": "^1.0.0",
     "morgan": "^1.5.1",
     "pi-gpio": "0.0.6",
     "rekuire": "^0.1.9",

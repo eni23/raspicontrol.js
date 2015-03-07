@@ -2,11 +2,16 @@ module.exports = {
   
   fs: require('fs'),
   path: require('path'),
+  schema: require('../src/schema'),
   jsonquery: require('json-query'),
 
   filename: "config.json",
   file: false,
   config: false,
+  
+  device: schema('device'),
+  
+  
   
   init: function(){
     this.file = this.path.dirname(require.main.filename)+"/"+this.filename;
