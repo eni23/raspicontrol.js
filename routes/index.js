@@ -1,9 +1,22 @@
 var express = require('express');
+var app = express();
 var router = express.Router();
 
-/* GET home page. */
+/* homepage */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-module.exports = router;
+
+
+/* json-api */
+app.use('/api/v1', require('./api'))
+
+/* gui */
+app.use('/gui', require('./gui'))
+
+
+
+
+
+module.exports = app,router;

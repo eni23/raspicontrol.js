@@ -6,12 +6,13 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
-
 var app = express();
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.set('json spaces', 2);
 
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
@@ -35,10 +36,22 @@ app.use(function(req, res, next) {
 // error handlers
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: err
-    });
+    
+    // if api-call, send json 
+    var apistr="/api/v1";
+    if ( req.url.substring(0, apistr.length) === apistr ) {
+		var api = require('./src/api');
+		var answer = api.get_template();
+		answer.statuscode=err.status;
+		res.json(answer)
+	} 
+	// otherwise send an html-error
+	else {
+		res.render('error', {
+			message: err.message,
+			error: err
+		});
+	}
 });
 
 

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/lib/bootstrap/css/bootstrap-theme.min.css">
+		<link rel='stylesheet' href='/css/style.css' />
+		<style>
+			pre.logger {
+				width:100%;
+				height: 260px;
+				background: black;
+				color: white;
+				overflow-y: scroll;
+			}
+			input {
+				margin-bottom: 3px;
+			}
+			body {
+				margin-top: -60px;
+				margin-bottom: 0px;
+			}
+			
+		</style>
+	</head>
+	<body class="container">
+		
+		
+		<h2>API Console</h2>
+		<pre class="logger"></pre>
+		<div class="well">
+			<b>device</b>
+			<p>
+				<button id="d-listall" class="btn btn-primary">list all</button>
+				<button id="d-listone" class="btn btn-primary">list single</button>
+				<button id="d-new" class="btn btn-primary">new</button>
+				<button id="d-update" class="btn btn-primary">update</button>
+				<button id="d-delete" class="btn btn-primary">delete</button>
+				
+			</p>
+			<p>
+				<input id="dv-id" type="text" class="form-control" placeholder="id" />
+				<input id="dv-name" type="text" class="form-control" placeholder="name" />
+				<input id="dv-port" type="text" class="form-control" placeholder="port" />
+				<input id="dv-icon" type="text" class="form-control" placeholder="icon" />
+				<input id="dv-color" type="text" class="form-control" placeholder="color" />
+			</p>
+		</div>
+		<div class="well">
+			<b>switch</b>
+			<p>
+				<button class="btn btn-primary">list all</button>
+				<button class="btn btn-primary">list single</button>
+				<button class="btn btn-primary">new</button>
+				<button class="btn btn-primary">update</button>
+				<button class="btn btn-primary">delete</button>
+				
+			</p>
+			<p>
+				<input type="text" class="form-control" placeholder="id" />
+				<input type="text" class="form-control" placeholder="device" />
+				type: <select>
+					<option>on</option>
+					<option>off</option>
+					<option>duration</option>
+				</select>				
+				<input type="text" class="form-control" placeholder="time" />
+				<input type="text" class="form-control" placeholder="duration" />
+			</p>
+		</div>	
+		
+		
+
+		
+		<script src="/lib/jquery/jquery.min.js"></script>
+		<script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+		<script>
+			
+			var loggercounter=0;
+			var loggerdiv=$("pre.logger");
+			var logger=function(str){
+				var lc=String("00000" + loggercounter).slice(-5);
+				loggerdiv.append(lc + " " + str + "\n");
+				loggerdiv.scrollTop(loggerdiv.prop("scrollHeight"));
+				loggercounter++;	
+			};
+			var logger_json =function(obj){
+				logger(JSON.stringify(obj, null, 2))
+			};
+			var ival = function(selector) {
+				return $("#"+selector).val();
+			}
+			
+			
+			var api = {
+				baseurl: "/api/v1/",
+				call: function( opts, callback ){
+					$.ajax({
+						url: this.baseurl+opts.url,
+						type: opts.method,
+						data: opts.data,
+						success: function(res) {
+							callback(res);
+						}
+					});
+				}
+			}
+
+			
+				
+			$(document).ready(function(){
+				
+				// device: list all
+				$("#d-listall").click(function(){
+					logger("list all devices:");
+					api.call( { url: "device", method: "get" }, function(res){
+						logger_json(res)
+					});
+				});
+				
+				// device: list single
+				$("#d-listone").click(function(){
+					var id=ival("dv-id");
+					logger("list single device, id:"+id);
+					api.call( { url: "device/"+id, method: "get" }, function(res){
+						logger_json(res)
+					});
+				});
+				
+				// new device
+				$("#d-new").click(function(){
+					var name=ival("dv-name");
+					var port=ival("dv-port");
+					var icon=ival("dv-icon");
+					var color=ival("dv-color");
+					api.call( { url: "device", method: "post", data: { name:name, port:port, icon:icon, color:color } }, function(res){
+						logger_json(res)
+					});
+				});
+				
+				// update device
+				$("#d-update").click(function(){
+					var id=ival("dv-id");
+					var name=ival("dv-name");
+					var port=ival("dv-port");
+					var icon=ival("dv-icon");
+					var color=ival("dv-color");
+					api.call( { url: "device/"+id, method: "put", data: { id:id, name:name, port:port, icon:icon, color:color } }, function(res){
+						logger_json(res)
+					});
+				});
+				
+				// delete device
+				$("#d-delete").click(function(){
+					var id=ival("dv-id");
+					api.call( { url: "device/"+id, method: "delete", data: { id:id } }, function(res){
+						logger_json(res)
+					});
+				});
+				
+				
+				
+				logger("ready");
+				
+			});
+		</script>
+	</body>
+</html>
+

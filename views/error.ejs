@@ -1,3 +1,16 @@
-<h1><%= message %></h1>
-<h2><%= error.status %></h2>
-<pre><%= error.stack %></pre>
+<% include partials/html-top %>
+
+
+    <main>
+	<div class="jumbotron">
+      <div class="container">
+		<h1><%= message %></h1>
+		<p><h2><%= error.status %></h2></p>
+		<pre><%= error.stack %></pre>
+		</div>
+    </div>
+    </main>
+
+
+
+<% include partials/html-bottom %>
