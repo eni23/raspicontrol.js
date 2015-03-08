@@ -1,34 +1,17 @@
-
-var EventEmitter = require( "events" ).EventEmitter;
-var rekuire = require('rekuire');
-var config  = rekuire('src/config');
-var util = require("util");
-var events = require("events");
-var EventEmitter = require( "events" ).EventEmitter;
+var rekuire       = require('rekuire');
+var config        = rekuire('src/config');
+var util          = require("util");
+var events        = require("events");
 
 
-function scheudlerevent() {
-    events.EventEmitter.call( this );
-    this._ids={};
-    return( this );
-}
 
-scheudlerevent.prototype = Object.create( events.EventEmitter.prototype );
-
-/*
-scheudlerevent.prototype.emit = function(){
-  console.log('emit', this)
-  scheudlerevent.prototype.emit.call(this)
-};
-
-*/
-
-
-function getscheudler() {
+// scheudler (main control function)
+function scheudler() {
     var self = this;
     var _hours = new Date().getHours();
     var _minutes = new Date().getMinutes();
     var tick = function() {
+        console.log('tikk');
         var date = new Date();
         var hours = date.getHours();
         var minutes = date.getMinutes();
@@ -43,24 +26,72 @@ function getscheudler() {
     tick();
 };
 
-util.inherits(getscheudler, scheudlerevent);
-scheudlerevent.prototype.every = scheudlerevent.prototype.on;
-scheudlerevent.prototype.at = scheudlerevent.prototype.once;
-scheudlerevent.prototype.cancel = scheudlerevent.prototype.removeListener;
-scheudlerevent.prototype.forget = scheudlerevent.prototype.removeAllListeners;
+// is child of EventEmitter
+util.inherits(scheudler, events.EventEmitter);
+scheudler.prototype.every   = scheudler.prototype.on;
+scheudler.prototype.at      = scheudler.prototype.once;
+scheudler.prototype.cancel  = scheudler.prototype.removeListener;
+scheudler.prototype.forget  = scheudler.prototype.removeAllListeners;
 
 
 
 
+// jobs class, gets created for every scheudle 
+function scheudlerjob(){
+  
+  var data        = false;
+  var durationcb  = false;
+  
+  
+  
+  this.init = function(_data){
+    data = _data;
+    console.log("scheudler("+data.id+") added job (time:"+data.time+" port:"+data.device.port+" type:"+data.type+")");
+  }
+  
+  function afterduration(){
+    console.log('scheudler('+data.id+'): duration done');
+    control(data.device.port,0);
+  }
+  
+  function control(port,status){
+    console.log("HW("+data.id+"): set port:"+port+" to="+status)
+  }
+  
+  this.run = function(){
+    console.log('scheudler('+data.id+')  running job ');
+    switch(data.type) {
+      case 'on':
+        control(data.device.port,1);
+        break;
+      
+      case 'off':
+        control(data.device.port,0);
+        break;
+        
+      case 'duration':
+        control(data.device.port,1);
+        var dur=parseInt(data.duration);
+        durationcb = setTimeout(afterduration, (dur*1000));
+        console.log('scheudler('+data.id+') durationcallback created run after:'+data.duration);
+        break;
+        
+      default:
+        break;
+    }
+  }
+  
+}
+
+
+
+// object accessible for other modules
 module.exports = {
   
-  reminder: false,
   jobs: false,
   
   init: function(){
-    this.reminder = new getscheudler();
-    console.log(this.reminder)
-    console.log("scheudler started");
+    this.scheudler = new scheudler();
     this.update();
   },
   
@@ -72,59 +103,17 @@ module.exports = {
     oo=res;
     if (res.length > 0 ){
       for (k in res){
-        switch(res[k].type) {
-          case 'on':
-            this.add_on(res[k]);
-            break;
-          case 'off':
-            this.add_off(res[k]);
-            break;
-          case 'duration':
-            this.add_duration(res[k]);
-            break;
-          default:
-            break;
-            
-        }
+        this.scheudle(res[k]);
       }
     }
   },
   
-  add_on: function(obj){
-    console.log('scheudler: add on-job, port:'+obj.device.port);
-    var cb=this.create_callback(obj.type, obj.device.port);
-    this.jobs[obj.id] = this.reminder.at(obj.time, cb )
+  scheudle: function( obj ){
+    this.jobs[obj.id]={};
+    this.jobs[obj.id].callback = new scheudlerjob();
+    this.jobs[obj.id].callback.init(obj);
+    this.jobs[obj.id].event = this.scheudler.at(obj.time, this.jobs[obj.id].callback.run )
   },
   
-  add_off: function(obj){
-    console.log('scheudler: add off',obj.device.port);
-  },
-  
-  add_duration: function(obj){
-    console.log('scheudler: add duration',obj.device.port);
-    var cb=this.create_callback(obj.type, obj.device.port, obj.duration);
-    this.jobs[obj.id] = this.reminder.at(obj.time, cb, obj )
-  },
-  
-  create_callback: function(type, port, duration){
-    
-    var that=this;
-    
-    if (duration > 0){
-      var cb=function(port,command){
-        console.log('that',that)
-        console.log("scheudler: duration on, port:"+port," oo:"+oo);
-        console.log(JSON.stringify(this, null, 2))
-        return setTimeout(function(){ console.log('scheudler: duration off, port:'+port) }, duration);
-      };
-    } 
-    else {
-      var cb=function(port,command){
-        console.log('that',that)
-        console.log("scheudler: onoff port:"+port+" cmd"+command);
-      }
-    }
-    return cb;
-  }
   
 }
