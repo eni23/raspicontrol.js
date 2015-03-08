@@ -67,23 +67,16 @@
     {
       "id": "mJeMPmShO",
       "device": "X17ylBhu",
-      "type": "on",
+      "type": "duration",
       "time": "07:50",
       "duration": 40
     },
     {
       "id": "mkZzv7rnu",
       "device": "X17ylBhu",
-      "type": "off",
-      "time": "16:30",
+      "type": "duration",
+      "time": "00:02",
       "duration": 50
-    },
-    {
-      "device": "",
-      "type": "off",
-      "time": "",
-      "duration": "0s",
-      "id": "Q1fFKOad"
     },
     {
       "id": "XyYMq_Td",
