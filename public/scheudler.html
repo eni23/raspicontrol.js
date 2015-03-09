@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/lib/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/lib/bootstrap-popover-x/bootstrap-popover-x.css">
+		<link rel='stylesheet' href='/lib/visjs/vis.css' />
+    <link rel='stylesheet' href='/css/style.css' />
+    
+		<style>
+
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+
+div.text.major {
+  display:none;
+}
+
+.vis.timeline .item {
+  border-radius: 0 ! important;
+  border-width:0;
+}
+
+/* colors for group */
+.vis.timeline .g01 .item {
+  background-color:#ffc107; 
+}
+.vis.timeline .g01 .item.selected {
+  background-color:#ffa000; 
+}
+
+.vis.timeline .g02 .item {
+  background-color:#ffc107; 
+}
+.vis.timeline .g02 .item.selected {
+  background-color:#ffa000; 
+}
+
+.vis.timeline .g03 .item {
+  background-color:#03a9f4; 
+}
+.vis.timeline .g03 .item.selected {
+  background-color:#0288d1; 
+}
+
+input.item-name {
+  border: 1px solid black;
+  background: transparent;
+}
+
+div.timetable-device {
+  display: block;
+  height: 85px;
+  width: 80px;
+}
+
+div.timetable-device div.icon {
+  padding-top: 10px;
+  font-size: 40px;
+  text-align: center;
+}
+div.timetable-device div.devicename {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+		</style>
+	</head>
+	<body>
+		
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">toggle Navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            <a class="navbar-brand" href="#!"><span class="glyphicon glyphicon-signal"></span> test</a>
+          </div>
+          <div id="navbar" class="collapse navbar-collapse">
+              <ul class="nav navbar-nav">
+                    <li><a href="#!">Control</a></li>
+                      <li class="active"><a href="#!">Scheudle</a></li>
+              </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <br /><br /><br />
+    <div id="visualization"></div>
+
+    <div id="popover2" class="popover popover-default">
+        <div class="arrow"></div>
+        <h3 class="popover-title"><span class="close" data-dismiss="popover-x">&times;</span><b>Edit Item</b></h3>
+        <div class="popover-content">
+            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+        </div>
+    </div>
+
+
+
+
+		
+		<script src="/lib/jquery/jquery.min.js"></script>
+    <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/lib/bootstrap-popover-x/bootstrap-popover-x.js"></script>
+    <script src="/lib/visjs/vis.js"></script>
+		<script src="/lib/moment.min.js"></script>
+
+
+    <script>
+
+
+var modcolor = function (col, amt) {
+  var usePound = false;
+  if (col[0] == "#") {
+    col = col.slice(1);
+    usePound = true;
+  }
+  var num = parseInt(col, 16);
+  var r = (num >> 16) + amt;
+  if (r > 255) {
+    r = 255;
+  } else if (r < 0) {
+    r = 0;
+  }
+  var b = ((num >> 8) & 0x00FF) + amt;
+  if (b > 255) {
+    b = 255;
+  } else if (b < 0) {
+    b = 0;
+  }
+  var g = (num & 0x0000FF) + amt;
+  if (g > 255) {
+    g = 255;
+  } else if (g < 0) {
+    g = 0;
+  }
+  return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
+}
+
+
+   var demodata={
+
+    "scheudles": [
+      {
+        "id": "a",
+        "name":"l1 on",
+        "device": "d-a",
+        "type": "on",
+        "time": "08:00",
+        "duration": false
+      },
+      {
+        "id": "b", 
+        "name":"l1 off",
+        "device": "d-a",
+        "type": "off",
+        "time": "19:00",
+        "duration": false
+      },
+      {
+        "id": "c",
+        "name":"l2 on",
+        "device": "d-b",
+        "type": "on",
+        "time": "09:00",
+        "duration": false
+      },
+      {
+        "id": "d",
+        "name":"l2 off",
+        "device": "d-b",
+        "type": "off",
+        "time": "18:30",
+        "duration": false
+      },
+      {
+        "id": "e",
+        "device": "d-c",
+        "name":"water1",
+        "type": "duration",
+        "time": "09:40",
+        "duration": 300
+      },
+      {
+        "id": "f",
+        "device": "d-c",
+        "name":"water2",
+        "type": "duration",
+        "time": "15:40",
+        "duration": 200
+      },
+      {
+        "id": "g",
+        "name":"water3",
+        "device": "d-c",
+        "type": "duration",
+        "time": "20:41",
+        "duration": "600"
+      },
+    ],
+    "devices": [
+      {
+       "id": "d-a",
+       "name": "lamp 1",
+       "port": 1,
+       "icon": "cog",
+       "color": "#ffeb3b"
+      },
+      {
+        "id": "d-b",
+        "name": "lamp 2",
+        "port": 2,
+        "icon": "cog",
+        "color": "#ffc107"
+      },
+      {
+        "id": "d-c",
+        "port": 3,
+        "name": "water",
+        "icon": "tint",
+        "color": "#2196f3"
+      }
+    ],
+  };
+
+
+
+   Date.prototype.yyyymmdd = function () {
+    var yyyy = this.getFullYear().toString();
+    var mm = (this.getMonth() + 1).toString();
+    var dd = this.getDate().toString();
+    return yyyy + '-' + (mm[1] ? mm : '0' + mm[0]) + '-' + (dd[1] ? dd : '0' + dd[0]);
+    };
+    
+    var clickpos = {
+      x: 0,
+      y: 0
+    };
+
+
+
+// client editor 
+var scheudler = {
+
+
+
+  init: function(){
+    //this.render(demodata);
+  },
+
+  render: function(data){
+    
+    data.devices.forEach(function(item){
+      console.log(item)
+    });
+
+
+  }
+
+}
+
+
+var addItem = function () {
+    show_popup();
+};
+
+
+var editid=false;
+var edititem=false;
+
+var select_item=function(evt){
+  if (evt.items.length == 1 ){
+    editid=items.get(evt.items[0])
+    edititem=$(".item.selected > .content").eq(0);
+
+    $('#popover2').popoverX({ target:edititem,placement:'bottom bottom-left' });
+    var offset=edititem.offset(),
+        top=edititem.height()+offset.top+15,
+        left=offset.left -( $('#popover2').width() *0.45),
+        newo={top:top,left:left};
+
+    $('#popover2').popoverX('show').offset(newo);
+    $('div.popover-content').html('<pre>'+JSON.stringify(editid.origData,false,2)+'</pre>');
+    console.log(offset);
+    
+    //val=edititem.text();
+    //edititem.html('<input type="text" class="item-name" value="'+val+'" autofocus />');
+  } else if (evt.items.length == 0 && editid ){
+    var val=$('input.item-name').val();
+    items.update({ id:editid.id, text: val });
+    edititem.html(val);
+    edititem=false;
+    timeline.redraw();
+  }
+}
+
+
+var d = new Date();
+var today = d.yyyymmdd();
+var todayStart = new Date();
+todayStart.setHours(0, 0, 0, 0);
+var todayEnd = new Date();
+todayEnd.setHours(24, 0, 0, 0);
+//console.log(demodata)
+
+
+//generate groupdata
+var groupdata=[];
+for(var k in demodata.devices) {
+  var item=demodata.devices[k];
+  var visItem={
+    id: item.id,
+    className: 'group_'+item.id,
+    content: '<div class="timetable-device"><div class="icon"><span class="glyphicon glyphicon-'+item.icon+'" aria-hidden="true"></span></div><div class="devicename">'+item.name+'</div></div>'
+  };
+  //style stuff
+  var darker=modcolor(item.color,-20);
+  $("<style>").prop("type", "text/css").html('.vis.timeline .group_'+item.id+' .item { background-color:'+item.color+'; } .vis.timeline .group_'+item.id+' .item.selected  { background-color:'+darker+'; }').appendTo('head');
+  groupdata.push(visItem);
+}
+
+//
+var scheudledata=[];
+for(var k in demodata.scheudles) {
+  var item=demodata.scheudles[k];
+  var visItem={
+    id:item.id,
+    content:item.name,
+    start: today + ' ' + item.time,
+    group: item.device,
+    className: item.type,
+    origData:item
+  }
+  if (item.type=='duration'){
+   var end=moment(today+' '+item.time).add( parseInt(item.duration) , 'seconds').format('HH:mm');
+   //visItem.push(end);
+  }
+  scheudledata.push(visItem);
+}
+
+console.log(groupdata,scheudledata)
+
+
+var groups = new vis.DataSet(groupdata);
+var items = new vis.DataSet(scheudledata);
+var container = document.getElementById('visualization');
+var options = {
+    /*height: 300,*/
+    min: todayStart,
+    max: todayEnd,
+    orientation: top,
+    editable: {
+        add: true,
+        updateTime: true,
+        updateGroup: false,
+        remove: true
+    },
+    format: {
+        minorLabels: {
+            weekday: '',
+            day: ' '
+        }
+    },
+    onAdd: addItem,
+    /*select: select_item*/
+};
+var timeline = new vis.Timeline(container);
+timeline.setOptions(options);
+timeline.setGroups(groups);
+timeline.setItems(items);
+timeline.on('select',select_item);
+
+
+
+
+
+$(document).ready(function () {
+    scheudler.init();
+    //$('.main-tooltip').popoverClosable({ html: true });
+});
+
+				
+
+		</script>
+
+
+<div id="myPopover1" class="popover popover-default">
+    <div class="arrow"></div>
+    <h3 class="popover-title"><span class="close" data-dismiss="popover-x">&times;</span>Title</h3>
+    <div class="popover-content">
+        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+    </div>
+</div>
+
+
+	</body>
+</html>
+

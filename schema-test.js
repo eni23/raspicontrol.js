@@ -15,7 +15,7 @@ var obj =  {
 
 var query1 = { id:"QJebv7H2_" }
 var query2 = [ { id:"QJebv7H2_",}, { id:"Qy-PmrhO" } ]
-var query3 = { type:"on" }
+var query3 = { }
 
 res=config.switch.resolve( query3 )
 console.log(res)
