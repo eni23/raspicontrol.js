@@ -17,7 +17,7 @@ module.exports = {
       "type": {
         "type": "string",
         "required": true,
-        "enum": [ "on", "off", "duration" ]
+        "enum": [ "on", "off", "toggle", "duration", "duration-toggle" ]
       },
       
       "time": {
