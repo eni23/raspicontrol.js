@@ -1,8 +1,88 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
-a {
-  color: #00B7FF;
+#visualization{
+	margin-top: 30px;
+}
+
+div.text.major {
+  display:none;
+}
+
+.vis.timeline .item {
+  border-radius: 0 ! important;
+  border-width:0;
+}
+
+/* colors for group */
+.vis.timeline .g01 .item {
+  background-color:#ffc107; 
+}
+.vis.timeline .g01 .item.selected {
+  background-color:#ffa000; 
+}
+
+.vis.timeline .g02 .item {
+  background-color:#ffc107; 
+}
+.vis.timeline .g02 .item.selected {
+  background-color:#ffa000; 
+}
+
+.vis.timeline .g03 .item {
+  background-color:#03a9f4; 
+}
+.vis.timeline .g03 .item.selected {
+  background-color:#0288d1; 
+}
+
+input.item-name {
+  border: 1px solid black;
+  background: transparent;
+}
+
+div.timetable-device {
+  display: block;
+  height: 85px;
+  width: 80px;
+}
+
+div.timetable-device div.icon {
+  padding-top: 10px;
+  font-size: 40px;
+  text-align: center;
+}
+div.timetable-device div.devicename {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+div.item.box.on, div.item.box.off, div.item.box.toggle {
+	font-family: 'Glyphicons Halflings' ! important;
+	background:transparent ! important;
+	border-radius: 5px ! important;
+	font-size: 16px;
+	margin-top: 10px;
+	width: 31px ! important;
+}
+
+div.item.box.on:before{
+	content: "\e017" ! important;
+	color:green ! important;
+}
+div.item.box.off:before{
+	content: "\e017" ! important;
+	color:red ! important;
+}
+div.item.box.toggle:before {
+	content: "\e031";
+	color: #1E90FF ! important;
+}
+
+.vis.timeline div.group div.background {
+	opacity: 0.3;
+	z-index: 0;
 }
