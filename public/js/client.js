@@ -18,14 +18,14 @@ todayEnd.setHours(24, 0, 0, 0);
 
 
 // client editor 
-var scheudler = {
+var scheduler = {
 
   
   self: this,
 
   // placeholders
   devices: [],
-  scheudles: [],
+  schedules: [],
   editid: false,
   timeline: false,
   visGroups: [],
@@ -42,7 +42,7 @@ var scheudler = {
   // init visjs timeline
   init_timeline: function(){
     this.visGroups = new vis.DataSet(this.devices);
-    this.visItems = new vis.DataSet(this.scheudles);
+    this.visItems = new vis.DataSet(this.schedules);
     var container = document.getElementById('visualization');
     var options = {
         /*height: 300,*/
@@ -63,15 +63,15 @@ var scheudler = {
         },
         /*onAdd: addItem,*/
         /*select: select_item*/
-        onMoving: scheudler.update_timeline_background
+        onMoving: scheduler.update_timeline_background
     };
     this.timeline = new vis.Timeline(container);
     this.timeline.setOptions(options);
     this.timeline.setGroups(this.visGroups);
     this.timeline.setItems(this.visItems);
     this.timeline.on('select',this.edit_item);
-    //this.timeline.on('rangechange',scheudler.update_timeline_background)
-    //setTimeout(scheudler.testcb,1500)
+    //this.timeline.on('rangechange',scheduler.update_timeline_background)
+    //setTimeout(scheduler.testcb,1500)
   },
 
 
@@ -91,9 +91,9 @@ var scheudler = {
       $("<style>").prop("type", "text/css").html('.vis.timeline .group_'+item.id+' .item { background-color:'+item.color+'; } .vis.timeline .group_'+item.id+' .item.selected  { background-color:'+darker+'; }').appendTo('head');
       this.devices.push(visItem);
     }
-    // scheudles
-    for(var k in data.scheudles) {
-      var item=data.scheudles[k];
+    // schedules
+    for(var k in data.schedules) {
+      var item=data.schedules[k];
       var visItem={
         id:item.id,
         /*content:item.name,*/
@@ -108,7 +108,7 @@ var scheudler = {
        visItem.end=today+' '+end;
        visItem.type='range';
       }
-      this.scheudles.push(visItem);
+      this.schedules.push(visItem);
     }
 
   },
@@ -125,21 +125,21 @@ var scheudler = {
     // if triggered by callback, update item fires
     // TODO: seperate function for dragging
     if (typeof items=='object'){
-      scheudler.visItems.update(items)
+      scheduler.visItems.update(items)
     };
 
     // loop over all groups
     var bgarr=[];
-    scheudler.visGroups.get().forEach(function(group){
+    scheduler.visGroups.get().forEach(function(group){
 
       // order items by date
-      var items = scheudler.visItems.get({
+      var items = scheduler.visItems.get({
         filter: function (item) {
           return item.group == group.id;
         }
       });
 
-      var sorted=items.sort(scheudler.visTimesort)
+      var sorted=items.sort(scheduler.visTimesort)
       var groupstr='group_'+group.id;
       
       // loop over all items and determine status of port aka timeline visualisation
@@ -186,30 +186,30 @@ var scheudler = {
       }
     });
 
-    scheudler.visItems.update(bgarr);
+    scheduler.visItems.update(bgarr);
     return true;
 
   },
 
 
   // gets called if user doubleclicks on a new
-  // TODO: replace scheudler. with self.
+  // TODO: replace scheduler. with self.
   // TODO: better popover placement
   edit_item: function(evt){
   
     if (evt.items.length == 1 ){
-      var requested_item=scheudler.visItems.get(evt.items[0]);
+      var requested_item=scheduler.visItems.get(evt.items[0]);
 
       // open on secound click
-      if (scheudler.editid===false){
-        scheudler.editid=requested_item;
+      if (scheduler.editid===false){
+        scheduler.editid=requested_item;
         return true;
       }
 
       // click on a different item
-      if (scheudler.editid.id != requested_item.id ){
+      if (scheduler.editid.id != requested_item.id ){
         $('#popover2').popoverX('hide');
-        scheudler.editid=requested_item;
+        scheduler.editid=requested_item;
         return true;
       }
 
@@ -222,13 +222,13 @@ var scheudler = {
       $('#popover2').popoverX('show').offset(newo);
       
       // todo: edit dialog
-      $('div.popover-content').html('<pre>'+JSON.stringify(scheudler.editid.origData,false,2)+'</pre>');
+      $('div.popover-content').html('<pre>'+JSON.stringify(scheduler.editid.origData,false,2)+'</pre>');
 
-      //scheudler.editid=false;
+      //scheduler.editid=false;
     }
     // hide popover if no item selected
     else if (evt.items.length == 0){
-      scheudler.editid=false;
+      scheduler.editid=false;
       $('#popover2').popoverX('hide');
     } 
   },
@@ -246,6 +246,6 @@ var scheudler = {
 
 
 $(document).ready(function () {
-    scheudler.init();
+    scheduler.init();
     //$('.main-tooltip').popoverClosable({ html: true });
 });
