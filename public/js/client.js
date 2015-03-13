@@ -38,7 +38,7 @@ var scheduler = {
     this.init_timeline();
     this.update_background();
     $(document).on('click',this.update_clickpos);
-    //scheduler.popover('#popover-edit');
+    scheduler.popover('#popover-edit');
   },
 
   // init visjs timeline
@@ -223,7 +223,16 @@ var scheduler = {
         return true;
       }
 
-      
+      var item=scheduler.visItems.get(evt.items[0]);
+      var start=moment(item.start).format('HH:mm');
+
+      $("#edit-type-"+item.origData.type).trigger('click')
+      $("#edit-start").val(start)
+      $('#edit-start').timepicker({
+        showMeridian: false,
+        showSeconds: false,
+      });
+
       var edititem=$(".item.selected > .content").parent();
       scheduler.popover('#popover-edit',edititem);
       scheduler.editid=false;

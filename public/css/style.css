@@ -62,14 +62,24 @@ div.timetable-device div.devicename {
 
 div.item.box.on, div.item.box.off, div.item.box.toggle {
 	font-family: 'Glyphicons Halflings' ! important;
-	/*background:transparent ! important;*/
-	/*border-radius: 5px ! important;
-	font-size: 16px;
-	margin-top: 10px;
-  */
-  font-size: 16px;
-	width: 31px ! important;
+  background-color: #e0e0e0 ! important;
+  border-color: #ccc ! important;
+  font-size: 12px ! important; 
+	width: 28px ! important;
   border-radius: 3px ! important;
+  border: 1px solid;
+  webkit-box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+  box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+  line-height: 1.5;
+  box-sizing: border-box;
+  background-image: linear-gradient(to bottom,#fff 0,#e0e0e0 100%);
+  text-shadow: 0 1px 0 #fff;
+}
+
+div.item.on.selected, div.item.selected.off, div.item.selected.toggle {
+  background-color: #D6D6D6 ! important;
+  border-color: #dbdbdb;
+  background-image: none;
 }
 
 div.item.box.on:before, .icon-action-on:before {
@@ -84,7 +94,13 @@ div.item.box.toggle:before, .icon-action-toggle:before{
 	content: "\e031";
 	color: #1E90FF ! important;
 }
-.icon-action-duration:before{
+
+div.item.range.duration {
+ font-family: 'Glyphicons Halflings' ! important;
+ min-width: 24px ! important;
+ text-align: center;
+}
+div.item.range.duration:before, .icon-action-duration:before{
   content: "\e120";
   color: #000000 ! important;
 }
@@ -103,11 +119,14 @@ div.item.range.duration, .icon-action-duration:before{
 }
 
 
-input.input-xs  {
-  font-size: 12px;
-  height: 22px;
-  padding: 0;
+.bootstrap-timepicker  {
+  width: 133px ! important;
 }
+.bootstrap-timepicker span{
+  font-size: 12px ! important;
+}
+
+
 .row-popover {
   margin-bottom: 5px;
 }
@@ -115,4 +134,8 @@ input.input-xs  {
 .tt-del {
   color: red;
   font-size: 12px;
+}
+
+.test {
+  background: red !important;
 }

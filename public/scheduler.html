@@ -9,7 +9,7 @@
 		<link rel='stylesheet' href='/lib/visjs/vis.css' />
     <link rel='stylesheet' href='/lib/material-icons/material-icons.css' />
     <link rel='stylesheet' href='/css/style.css' />
-    
+    <link rel="stylesheet" href="/lib/bootstrap-3-timepicker/css/bootstrap-timepicker.min.css" />
 		<style>
 		</style>
 	</head>
@@ -50,22 +50,22 @@
               <div class="col-md-3">
                 Type:
               </div>
-              <div class="col-md-9">
+              <div class="col-md-9 popover-edit-type">
                 <div class="btn-group" data-toggle="buttons">
-                  <label class="btn btn-default btn-sm active">
-                    <input type="radio" name="options" id="option1" autocomplete="off" checked>
+                  <label class="btn btn-default btn-sm">
+                    <input type="radio" name="type" id="edit-type-on" autocomplete="off">
                     <span class="glyphicon icon-action-on"></span>
                   </label>
                   <label class="btn btn-default btn-sm">
-                    <input type="radio" name="options" id="option1" autocomplete="off">
+                    <input type="radio" name="type" id="edit-type-off" autocomplete="off">
                     <span class="glyphicon icon-action-off"></span>
                   </label>
                   <label class="btn btn-default btn-sm">
-                    <input type="radio" name="options" id="option1" autocomplete="off">
+                    <input type="radio" name="type" id="edit-type-toggle" autocomplete="off">
                     <span class="glyphicon icon-action-toggle"></span>
                   </label>
                   <label class="btn btn-default btn-sm">
-                    <input type="radio" name="options" id="option1" autocomplete="off">
+                    <input type="radio" name="type" id="edit-type-duration" autocomplete="off">
                     <span class="glyphicon icon-action-duration"></span>
                   </label>
                 </div>
@@ -77,10 +77,15 @@
                 Start:
               </div>
               <div class="col-md-9">
-                <input type="text" class="form-control input-xs"  />
+                <div class="input-group bootstrap-timepicker">
+                  <input type="text" class="form-control input-small" id="edit-start"  />
+                  <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                </div>
+                
               </div>
             </div>
 
+            <!--
             <div class="row row-popover">
               <div class="col-md-3">
                 Duration:
@@ -89,15 +94,15 @@
                 <input type="text" class="form-control input-xs"  />
               </div>
             </div>
-
+            !-->
             <div class="row row-popover">
               <div class="col-md-12">
                 <button class="btn btn-sm btn-danger">
-                  <span class="glyphicon mdi-action-delete" title="delete this item"></span> Delete
+                  <span class="glyphicon mdi-action-delete" title="delete this item"></span> Delete this Item
                 </button>
               </div>
             </div>
-
+            
 
         </div>
     </div>
@@ -105,6 +110,7 @@
 		<script src="/lib/jquery/jquery.min.js"></script>
     <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
     <script src="/lib/bootstrap-popover-x/bootstrap-popover-x.js"></script>
+    <script src="/lib/bootstrap-3-timepicker/js/bootstrap-timepicker.js"></script>
     <script src="/lib/visjs/vis.js"></script>
 		<script src="/lib/moment.min.js"></script>
     <script src="/js/client.js"></script>
