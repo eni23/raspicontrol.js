@@ -62,27 +62,57 @@ div.timetable-device div.devicename {
 
 div.item.box.on, div.item.box.off, div.item.box.toggle {
 	font-family: 'Glyphicons Halflings' ! important;
-	background:transparent ! important;
-	border-radius: 5px ! important;
+	/*background:transparent ! important;*/
+	/*border-radius: 5px ! important;
 	font-size: 16px;
 	margin-top: 10px;
+  */
+  font-size: 16px;
 	width: 31px ! important;
+  border-radius: 3px ! important;
 }
 
-div.item.box.on:before{
+div.item.box.on:before, .icon-action-on:before {
 	content: "\e017" ! important;
 	color:green ! important;
 }
-div.item.box.off:before{
+div.item.box.off:before, .icon-action-off:before{
 	content: "\e017" ! important;
 	color:red ! important;
 }
-div.item.box.toggle:before {
+div.item.box.toggle:before, .icon-action-toggle:before{
 	content: "\e031";
 	color: #1E90FF ! important;
+}
+.icon-action-duration:before{
+  content: "\e120";
+  color: #000000 ! important;
+}
+
+div.item.range.duration, .icon-action-duration:before{
+  border-radius: 3px ! important;
 }
 
 .vis.timeline div.group div.background {
 	opacity: 0.3;
 	z-index: 0;
+}
+
+#popover-placement {
+  display: none;
+}
+
+
+input.input-xs  {
+  font-size: 12px;
+  height: 22px;
+  padding: 0;
+}
+.row-popover {
+  margin-bottom: 5px;
+}
+
+.tt-del {
+  color: red;
+  font-size: 12px;
 }

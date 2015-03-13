@@ -7,6 +7,7 @@
 		<link rel="stylesheet" href="/lib/bootstrap/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="/lib/bootstrap-popover-x/bootstrap-popover-x.css">
 		<link rel='stylesheet' href='/lib/visjs/vis.css' />
+    <link rel='stylesheet' href='/lib/material-icons/material-icons.css' />
     <link rel='stylesheet' href='/css/style.css' />
     
 		<style>
@@ -33,13 +34,71 @@
             </div>
         </div>
     </nav>
-  
+    
+    <button id='popover-placement'></button>
+
     <div id="visualization"></div>
-    <div id="popover2" class="popover popover-default">
+    <div id="popover-edit" class="popover popover-default">
         <div class="arrow"></div>
-        <h3 class="popover-title"><span class="close" data-dismiss="popover-x">&times;</span><b>Edit Item</b></h3>
+        <h3 class="popover-title">
+          <span class="close" data-dismiss="popover-x">&times;</span>
+          <b>Edit Item</b>
+        </h3>
         <div class="popover-content">
-            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+
+            <div class="row row-popover">
+              <div class="col-md-3">
+                Type:
+              </div>
+              <div class="col-md-9">
+                <div class="btn-group" data-toggle="buttons">
+                  <label class="btn btn-default btn-sm active">
+                    <input type="radio" name="options" id="option1" autocomplete="off" checked>
+                    <span class="glyphicon icon-action-on"></span>
+                  </label>
+                  <label class="btn btn-default btn-sm">
+                    <input type="radio" name="options" id="option1" autocomplete="off">
+                    <span class="glyphicon icon-action-off"></span>
+                  </label>
+                  <label class="btn btn-default btn-sm">
+                    <input type="radio" name="options" id="option1" autocomplete="off">
+                    <span class="glyphicon icon-action-toggle"></span>
+                  </label>
+                  <label class="btn btn-default btn-sm">
+                    <input type="radio" name="options" id="option1" autocomplete="off">
+                    <span class="glyphicon icon-action-duration"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="row row-popover">
+              <div class="col-md-3">
+                Start:
+              </div>
+              <div class="col-md-9">
+                <input type="text" class="form-control input-xs"  />
+              </div>
+            </div>
+
+            <div class="row row-popover">
+              <div class="col-md-3">
+                Duration:
+              </div>
+              <div class="col-md-9">
+                <input type="text" class="form-control input-xs"  />
+              </div>
+            </div>
+
+            <div class="row row-popover">
+              <div class="col-md-12">
+                <button class="btn btn-sm btn-danger">
+                  <span class="glyphicon mdi-action-delete" title="delete this item"></span> Delete
+                </button>
+              </div>
+            </div>
+
+
         </div>
     </div>
 		
@@ -79,7 +138,7 @@ var modcolor = function (col, amt) {
   } else if (g < 0) {
     g = 0;
   }
-  return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
+  return (usePound?"#":"") + String("000000" + (g | (b << 8) | (r << 16)).toString(16)).slice(-6);
 }
 
 
@@ -174,7 +233,7 @@ var modcolor = function (col, amt) {
         "name": "lamp 2",
         "port": 2,
         "icon": "cog",
-        "color": "#f50057"
+        "color": "#ffc107"
       },
       {
         "id": "d-c",

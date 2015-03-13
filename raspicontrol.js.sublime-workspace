@@ -1,0 +1,484 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"s",
+				"start"
+			],
+			[
+				"up",
+				"update"
+			],
+			[
+				"gr",
+				"group"
+			],
+			[
+				"ite",
+				"items"
+			],
+			[
+				"sch",
+				"scheudler"
+			],
+			[
+				"se",
+				"setItems"
+			],
+			[
+				"re",
+				"return"
+			],
+			[
+				"upda",
+				"update_timeline_background"
+			],
+			[
+				"time",
+				"Timeline"
+			],
+			[
+				"drag",
+				"dragtimeout"
+			],
+			[
+				"remo",
+				"removeids"
+			],
+			[
+				"back",
+				"background"
+			],
+			[
+				"visI",
+				"visItems"
+			],
+			[
+				"ba",
+				"background"
+			],
+			[
+				"lo",
+				"log"
+			],
+			[
+				"ori",
+				"origData"
+			],
+			[
+				"c",
+				"console"
+			],
+			[
+				"grou",
+				"group"
+			],
+			[
+				"gro",
+				"group"
+			],
+			[
+				"fo",
+				"forEach"
+			],
+			[
+				"sor",
+				"sorted"
+			],
+			[
+				"l",
+				"log"
+			],
+			[
+				"con",
+				"console"
+			],
+			[
+				"wi",
+				"width"
+			],
+			[
+				"fon",
+				"font-size"
+			],
+			[
+				"or",
+				"origData"
+			],
+			[
+				"ed",
+				"editid"
+			],
+			[
+				"sc",
+				"scheudler"
+			],
+			[
+				"sche",
+				"scheudler"
+			],
+			[
+				"it",
+				"items"
+			],
+			[
+				"de",
+				"devices"
+			],
+			[
+				"edi",
+				"editid"
+			],
+			[
+				"off",
+				"offset"
+			],
+			[
+				"h",
+				"height"
+			],
+			[
+				"new",
+				"newo"
+			],
+			[
+				"editi",
+				"edititem"
+			],
+			[
+				"scheudle",
+				"scheudledata"
+			],
+			[
+				"tim",
+				"time"
+			],
+			[
+				"i",
+				"item"
+			],
+			[
+				"class",
+				"className"
+			],
+			[
+				"background",
+				"background-color"
+			],
+			[
+				"col",
+				"color"
+			],
+			[
+				"font-s",
+				"font-size"
+			],
+			[
+				"dev",
+				"devices"
+			],
+			[
+				"ren",
+				"render_data"
+			],
+			[
+				"in",
+				"init"
+			],
+			[
+				"ti",
+				"timeline"
+			],
+			[
+				"edit",
+				"edititem"
+			],
+			[
+				"sele",
+				"select_item"
+			],
+			[
+				"fun",
+				"function"
+			],
+			[
+				"rec",
+				"record"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "public/js/client.js",
+			"settings":
+			{
+				"buffer_size": 6471,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "networking hosting 2.0\n* ",
+			"settings":
+			{
+				"buffer_size": 25,
+				"line_ending": "Unix",
+				"name": "networking hosting 2.0"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"ssph",
+				"Set Syntax: PHP"
+			],
+			[
+				"Snippet: ",
+				"Snippet: require_once …"
+			]
+		],
+		"width": 440.0
+	},
+	"console":
+	{
+		"height": 168.0,
+		"history":
+		[
+			"ls",
+			"print \"demo\";",
+			"print \"demo\"",
+			"print",
+			"ip",
+			"help",
+			"ls"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/eni/code/raspicontrol.js",
+		"/home/eni/code/raspicontrol.js/public",
+		"/home/eni/code/raspicontrol.js/public/css",
+		"/home/eni/code/raspicontrol.js/public/js"
+	],
+	"file_history":
+	[
+		"/home/eni/code/raspicontrol.js/public/scheduler.html",
+		"/home/eni/doc/Quovadis",
+		"/home/eni/code/raspicontrol.js/raspicontrol.js.sublime-project",
+		"/home/eni/progs/gogs/conf/app.ini",
+		"/home/eni/progs/raspicontrol.js/public/js/client.js",
+		"/home/eni/progs/raspicontrol.js/public/lib/bootstrap/css/bootstrap.css",
+		"/home/eni/progs/raspicontrol.js/public/css/style.css",
+		"/home/eni/progs/raspicontrol.js/public/scheudler.html",
+		"/home/eni/progs/raspicontrol.js/app.js",
+		"/home/eni/progs/raspicontrol.js/public/lib/bootstrap/js/bootstrap.js",
+		"/home/eni/progs/raspicontrol.js/public/js/client,",
+		"/home/eni/tmp/titoni-hack/loganalyze.sh",
+		"/home/eni/progs/dns/tinydns/tinydns.class.php"
+	],
+	"find":
+	{
+		"height": 23.0
+	},
+	"find_in_files":
+	{
+		"height": 90.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"scheudle",
+			"});*/\n",
+			"console",
+			"setTimeout",
+			"scheudler",
+			"',*/\n",
+			"off",
+			"glyphicon",
+			"console.log",
+			"    <",
+			"48",
+			"');\n",
+			"this"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"schedule"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "public/js/client.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6471,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5965,
+								5965
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2550.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 25,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								25,
+								25
+							]
+						],
+						"settings":
+						{
+							"auto_name": "networking hosting 2.0",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"project": "raspicontrol.js.sublime-project",
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 318.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

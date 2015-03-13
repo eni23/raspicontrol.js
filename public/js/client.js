@@ -36,7 +36,9 @@ var scheduler = {
   init: function(){
     this.render(demodata);
     this.init_timeline();
-    this.update_timeline_background();
+    this.update_background();
+    $(document).on('click',this.update_clickpos);
+    //scheduler.popover('#popover-edit');
   },
 
   // init visjs timeline
@@ -62,8 +64,7 @@ var scheduler = {
             }
         },
         /*onAdd: addItem,*/
-        /*select: select_item*/
-        onMoving: scheduler.update_timeline_background
+        onMoving: scheduler.drag_item
     };
     this.timeline = new vis.Timeline(container);
     this.timeline.setOptions(options);
@@ -118,82 +119,91 @@ var scheduler = {
     return new Date(a.start).getTime() - new Date(b.start).getTime();
   },
 
-
-  update_counter: 0,
-  update_timeline_background: function(items){
-    
-    // if triggered by callback, update item fires
-    // TODO: seperate function for dragging
-    if (typeof items=='object'){
-      scheduler.visItems.update(items)
-    };
-
-    // loop over all groups
-    var bgarr=[];
-    scheduler.visGroups.get().forEach(function(group){
-
-      // order items by date
-      var items = scheduler.visItems.get({
-        filter: function (item) {
-          return item.group == group.id;
-        }
-      });
-
-      var sorted=items.sort(scheduler.visTimesort)
-      var groupstr='group_'+group.id;
-      
-      // loop over all items and determine status of port aka timeline visualisation
-      var is_on=false;
-      
-      for (k in sorted){
-        var item=sorted[k];
-        var last=bgarr[bgarr.length-1];
-        if (item.type=='background') continue;
-        if (item.origData.type=='on'){
-          is_on=true;
-          var add={
-            id:  groupstr+item.id,
-            start: item.start,
-            type: 'background',
-            group: group.id
-          }
-          bgarr.push(add);
-        }
-        
-        else if (item.origData.type=='off'){
-          is_on=false;
-          last.end=item.start;
-        }
-
-        else if (item.origData.type=='toggle'){
-          if (is_on){
-            last.end=item.start;
-            is_on=false;
-          }
-          else {
-            is_on=true;
-            var add={
-              id:  groupstr+item.id,
-              start: item.start,
-              type: 'background',
-              group: group.id
+  get_group_items: function(group){
+    var items = scheduler.visItems.get({
+            filter: function (item) {
+              return item.group == group;
             }
-            bgarr.push(add);
-          }
-        }
-
-
-      }
-    });
-
-    scheduler.visItems.update(bgarr);
-    return true;
-
+          });
+    return items;
   },
 
 
+  drag_item: function(item){
+    scheduler.visItems.update(item)
+    scheduler.update_group_background(item.group)
+    //scheduler.api.save(item);
+  },
+
+  update_background: function(){
+    this.visGroups.get().forEach(function(group){
+      scheduler.update_group_background(group.id);
+    });
+  },
+
+  update_group_background: function(group){
+
+    var groupitems=this.get_group_items(group);
+    var sorted=groupitems.sort(this.visTimesort);
+    var background=[];
+    var delitems=[];
+    var groupstr='group_'+group;
+
+
+    for (k in sorted){
+
+      var item=sorted[k];
+      var last=background[background.length-1];
+      var bgtemplate={
+        id:  groupstr+item.id,
+        type: 'background',
+        group: group
+      };
+
+      if (item.type=='background'){
+        delitems.push(item.id);
+        continue;
+      }
+
+      if (item.origData.type=='on'){
+        is_on=true;
+        bgtemplate.start=item.start;
+        background.push(bgtemplate);
+      }
+
+      else if (item.origData.type=='off'){
+        is_on=false;
+        last.end=item.start;
+      }
+
+      else if (item.origData.type=='toggle'){
+        if (is_on){
+          last.end=item.start;
+          is_on=false;
+        }
+        else {
+          is_on=true;
+          bgtemplate.start=item.start;
+          background.push(bgtemplate);
+        }
+      }
+
+      else if (item.origData.type=='duration'){
+        is_on=true;
+        bgtemplate.start=item.start;
+        bgtemplate.end=item.end;
+        background.push(bgtemplate);
+      }
+
+    }
+    this.visItems.remove(delitems);
+    this.visItems.update(background);
+    return true;
+  },
+
+
+
   // gets called if user doubleclicks on a new
-  // TODO: replace scheduler. with self.
   // TODO: better popover placement
   edit_item: function(evt){
   
@@ -208,35 +218,54 @@ var scheduler = {
 
       // click on a different item
       if (scheduler.editid.id != requested_item.id ){
-        $('#popover2').popoverX('hide');
+        $('#popover-edit').popoverX('hide');
         scheduler.editid=requested_item;
         return true;
       }
 
-      var edititem=$(".item.selected > .content").eq(0);
-      $('#popover2').popoverX({ target:edititem,placement:'bottom bottom-left' });
-      var offset=edititem.offset(),
-          top=edititem.height()+offset.top+15,
-          left=offset.left -( $('#popover2').width() *0.45),
-          newo={top:top,left:left};
-      $('#popover2').popoverX('show').offset(newo);
       
-      // todo: edit dialog
-      $('div.popover-content').html('<pre>'+JSON.stringify(scheduler.editid.origData,false,2)+'</pre>');
+      var edititem=$(".item.selected > .content").parent();
+      scheduler.popover('#popover-edit',edititem);
+      scheduler.editid=false;
 
-      //scheduler.editid=false;
     }
     // hide popover if no item selected
     else if (evt.items.length == 0){
       scheduler.editid=false;
-      $('#popover2').popoverX('hide');
+      $('#popover-edit').popoverX('hide');
     } 
+  },
+
+  popover: function(selector, target){
+    var elem=$(selector);
+    if (typeof target == 'undefined') {
+      var target=$('#popover-placement');
+      var newpos={
+        top: scheduler.clickpos.top,
+        left: scheduler.clickpos.left - ( elem.width() / 2)
+      }
+    } 
+    else {
+      var offset=target.offset();
+      var newpos={
+        top: offset.top + (target.height() * 2),
+        left: offset.left - ( elem.width() / 2) + ( target.width() * 0.75 ) 
+      }
+    } 
+    elem.popoverX({ target:target, placement:'bottom' });
+    elem.popoverX('show').offset(newpos);
   },
 
 
   // gets called if user tries to add new entry
   new_item: function(){
 
+  },
+
+
+  clickpos: {},
+  update_clickpos: function(evt){
+    scheduler.clickpos={ top: evt.pageY, left: evt.pageX };
   }
 
 
