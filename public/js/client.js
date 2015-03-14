@@ -183,16 +183,12 @@ var scheduler = {
     var rate=20;
     if (scheduler.drag_timeline_timeout==false){
       scheduler.drag_timeline_timeout=setTimeout(scheduler.drag_timeline_cb,rate);
-      scheduler.drag_timeline_real();
+      if ( $("#popover-edit").is(":visible") && scheduler.edit_new_item==false ) {
+        var open_elem=$(".item.selected > .content").parent();
+        scheduler.popover("#popover-edit",open_elem);
+      }
     }
     return true;
-  },
-  // rate-limiting gets called by drag_timeline
-  drag_timeline_real: function(){
-    if ( $("#popover-edit").is(":visible") && scheduler.edit_new_item==false ) {
-      var open_elem=$(".item.selected > .content").parent();
-      scheduler.popover("#popover-edit",open_elem);
-    }
   },
   // gets called by drag-timeline-timeout to reset rate limiting to zero
   drag_timeline_cb: function(){
