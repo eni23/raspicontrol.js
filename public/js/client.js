@@ -1,17 +1,47 @@
+// TODO: move to own file
+// darken or lighten a color  amt- for darken and amt+ for lighten
+var modcolor = function (col, amt) {
+  var usePound = false;
+  if (col[0] == "#") {
+    col = col.slice(1);
+    usePound = true;
+  }
+  var num = parseInt(col, 16);
+  var r = (num >> 16) + amt;
+  if (r > 255) {
+    r = 255;
+  } else if (r < 0) {
+    r = 0;
+  }
+  var b = ((num >> 8) & 0x00FF) + amt;
+  if (b > 255) {
+    b = 255;
+  } else if (b < 0) {
+    b = 0;
+  }
+  var g = (num & 0x0000FF) + amt;
+  if (g > 255) {
+    g = 255;
+  } else if (g < 0) {
+    g = 0;
+  }
+  return (usePound?"#":"") + String("000000" + (g | (b << 8) | (r << 16)).toString(16)).slice(-6);
+}
+
+// TODO: replace with moment.js
 Date.prototype.yyyymmdd = function () {
     var yyyy = this.getFullYear().toString();
     var mm = (this.getMonth() + 1).toString();
     var dd = this.getDate().toString();
     return yyyy + '-' + (mm[1] ? mm : '0' + mm[0]) + '-' + (dd[1] ? dd : '0' + dd[0]);
 };
-
-
 var d = new Date();
 var today = d.yyyymmdd();
 var todayStart = new Date();
 todayStart.setHours(0, 0, 0, 0);
 var todayEnd = new Date();
 todayEnd.setHours(24, 0, 0, 0);
+
 
 
 
@@ -149,22 +179,33 @@ var scheduler = {
 
   // gets called when a user drags an item around
   drag_item: function(item){
+
+    // if type is duration calculate secounds
+    if ( item.origData.type=='duration'){
+      var dur_calc=( item.end-item.start ) / 1000;
+      item.origData.duration = dur_calc;
+    }
     scheduler.visItems.update(item)
     scheduler.update_group_background(item.group)
 
     // if edit-tooltip is open, update time and move tooltip too
+    // TODO: only move popover not create again
     if ( $("#popover-edit").is(":visible") ) {
       var moving_elem=$(".item.selected > .content").parent();
       var newtime=moment(item.start).format('HH:mm');
       scheduler.popover("#popover-edit",moving_elem);
       $("#edit-start").val(newtime);
       $("#popover-edit").data(item)
-    } 
+      // is duration
+      if ( item.origData.type=='duration'){
+        $("#edit-duration").val(dur_calc);
+      }
+    }
     
     //scheduler.api.save(item);
     return true;
-
   },
+
 
   // update background of all groups
   update_background: function(){
@@ -345,11 +386,16 @@ var scheduler = {
 
   // gets called if user changes values in edit-popover input fields
   edit_change_form: function(evt){
+
+    console.log('updateforn')
     if (scheduler.edit_new_item) return true;
     var item=$("#popover-edit").data();
+    
     if ( $(this).hasClass('item-form-duration') ){
       var end=moment(item.start).add( parseInt($(this).val()) , 'seconds').format('HH:mm');
       item.end=today+" "+end;
+
+      item.origData.duration = $("#edit-duration").val();
       //scheduler.visItems.update(item);
       scheduler.drag_item(item);
     }
