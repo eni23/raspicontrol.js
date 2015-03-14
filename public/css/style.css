@@ -119,23 +119,24 @@ div.item.range.duration, .icon-action-duration:before{
 }
 
 
-.bootstrap-timepicker  {
+.bootstrap-timepicker, .item-form-duration  {
   width: 133px ! important;
 }
-.bootstrap-timepicker span{
-  font-size: 12px ! important;
-}
-
 
 .row-popover {
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 
-.tt-del {
-  color: red;
+.input-xs {
+  height: 22px;
+  padding: 5px 5px;
   font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
 }
 
-.test {
-  background: red !important;
+
+
+.edit-item-delarea {
+  margin-top: 18px;
 }

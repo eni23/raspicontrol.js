@@ -37,8 +37,13 @@ var scheduler = {
     this.render(demodata);
     this.init_timeline();
     this.update_background();
+    
+
     $(document).on('click',this.update_clickpos);
-    scheduler.popover('#popover-edit');
+
+    // edit popover change type
+    $(".popover-edit-type > div > label").click(this.edit_change_type);
+    $(".popover-edit input").on("input", this.edit_change_form);
   },
 
   // init visjs timeline
@@ -150,7 +155,9 @@ var scheduler = {
     var groupstr='group_'+group;
 
 
+    var is_on=false;
     for (k in sorted){
+
 
       var item=sorted[k];
       var last=background[background.length-1];
@@ -166,12 +173,14 @@ var scheduler = {
       }
 
       if (item.origData.type=='on'){
+        if (is_on) continue;
         is_on=true;
         bgtemplate.start=item.start;
         background.push(bgtemplate);
       }
 
       else if (item.origData.type=='off'){
+        if (last.end) continue;
         is_on=false;
         last.end=item.start;
       }
@@ -194,7 +203,11 @@ var scheduler = {
         bgtemplate.end=item.end;
         background.push(bgtemplate);
       }
+    }
 
+    last=background[background.length-1];
+    if (!last.end){
+      last.end=today+" "+"24:00";
     }
     this.visItems.remove(delitems);
     this.visItems.update(background);
@@ -223,18 +236,25 @@ var scheduler = {
         return true;
       }
 
+
       var item=scheduler.visItems.get(evt.items[0]);
       var start=moment(item.start).format('HH:mm');
 
-      $("#edit-type-"+item.origData.type).trigger('click')
-      $("#edit-start").val(start)
+      $("#popover-edit").data(item);
+      $("#edit-type-"+item.origData.type).trigger('click');
+      $("#edit-start").val(start);
+      $
+      $("#edit-duration").val(item.origData.duration)
       $('#edit-start').timepicker({
         showMeridian: false,
         showSeconds: false,
+        showInputs: false,
+        minuteStep: 1,
       });
 
-      var edititem=$(".item.selected > .content").parent();
-      scheduler.popover('#popover-edit',edititem);
+
+      var timeline_elem=$(".item.selected > .content").parent();
+      scheduler.popover('#popover-edit',timeline_elem)
       scheduler.editid=false;
 
     }
@@ -244,6 +264,32 @@ var scheduler = {
       $('#popover-edit').popoverX('hide');
     } 
   },
+
+
+  edit_change_type: function(evt){
+
+
+    var item=$("#popover-edit").data();
+    if ($(this).hasClass("duration")){
+        $(".edit-row-duration").show();
+    }
+    else {
+      $(".edit-row-duration").hide();
+    }
+
+  },
+
+  edit_change_form: function(evt){
+    var item=$("#popover-edit").data();
+    if ( $(this).hasClass('item-form-duration') ){
+      var end=moment(item.start).add( parseInt($(this).val()) , 'seconds').format('HH:mm');
+      item.end=today+" "+end;
+      //scheduler.visItems.update(item);
+      scheduler.drag_item(item);
+    }
+  },
+
+
 
   popover: function(selector, target){
     var elem=$(selector);

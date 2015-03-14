@@ -29,7 +29,7 @@
           <div id="navbar" class="collapse navbar-collapse">
               <ul class="nav navbar-nav">
                     <li><a href="#!">Control</a></li>
-                    <li class="active"><a href="#!">schedule</a></li>
+                    <li class="active"><a href="#!">Schedule</a></li>
               </ul>
             </div>
         </div>
@@ -38,11 +38,14 @@
     <button id='popover-placement'></button>
 
     <div id="visualization"></div>
-    <div id="popover-edit" class="popover popover-default">
+    
+
+
+    <div id="popover-edit" class="popover popover-default popover-edit">
         <div class="arrow"></div>
         <h3 class="popover-title">
           <span class="close" data-dismiss="popover-x">&times;</span>
-          <b>Edit Item</b>
+          <b>Edit</b>
         </h3>
         <div class="popover-content">
 
@@ -52,19 +55,19 @@
               </div>
               <div class="col-md-9 popover-edit-type">
                 <div class="btn-group" data-toggle="buttons">
-                  <label class="btn btn-default btn-sm">
+                  <label class="btn btn-default btn-sm on">
                     <input type="radio" name="type" id="edit-type-on" autocomplete="off">
                     <span class="glyphicon icon-action-on"></span>
                   </label>
-                  <label class="btn btn-default btn-sm">
+                  <label class="btn btn-default btn-sm off">
                     <input type="radio" name="type" id="edit-type-off" autocomplete="off">
                     <span class="glyphicon icon-action-off"></span>
                   </label>
-                  <label class="btn btn-default btn-sm">
+                  <label class="btn btn-default btn-sm toggle">
                     <input type="radio" name="type" id="edit-type-toggle" autocomplete="off">
                     <span class="glyphicon icon-action-toggle"></span>
                   </label>
-                  <label class="btn btn-default btn-sm">
+                  <label class="btn btn-default btn-sm duration">
                     <input type="radio" name="type" id="edit-type-duration" autocomplete="off">
                     <span class="glyphicon icon-action-duration"></span>
                   </label>
@@ -77,25 +80,26 @@
                 Start:
               </div>
               <div class="col-md-9">
-                <div class="input-group bootstrap-timepicker">
-                  <input type="text" class="form-control input-small" id="edit-start"  />
+                <div class="input-group bootstrap-timepicker input-group-sm">
+                  <input type="text" class="form-control" id="edit-start"  />
                   <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
                 </div>
                 
               </div>
             </div>
 
-            <!--
-            <div class="row row-popover">
+            
+            <div class="row row-popover edit-row-duration">
               <div class="col-md-3">
                 Duration:
               </div>
               <div class="col-md-9">
-                <input type="text" class="form-control input-xs"  />
+                <input type="number" id="edit-duration" class="form-control input-sm item-form-duration"  />
               </div>
             </div>
-            !-->
-            <div class="row row-popover">
+
+            
+            <div class="row row-popover edit-item-delarea">
               <div class="col-md-12">
                 <button class="btn btn-sm btn-danger">
                   <span class="glyphicon mdi-action-delete" title="delete this item"></span> Delete this Item
