@@ -40,7 +40,7 @@ var scheduler = {
     this.update_background();
     
 
-    $(document).on('click touch tap',this.update_clickpos);
+    $(document).on('click tap',this.update_clickpos);
 
     // edit popover change type
     $(".popover-edit-type > div > label").click(this.edit_change_type);
@@ -488,8 +488,18 @@ var scheduler = {
   update_clickpos: function(evt){
     if (evt.pageX && evt.pageX){
       scheduler.clickpos={ top: evt.pageY, left: evt.pageX };
+    } 
+    // is touch or tap
+    else {
+      if (typeof evt.originalEvent == 'undefined') return;
+      if (typeof evt.originalEvent.gesture.touches[0] == 'undefined') return;
+      var touch=evt.originalEvent.gesture.touches[0];
+      scheduler.clickpos={ top: touch.pageY, left: touch.pageX };
     }
+    console.log(scheduler.clickpos)
+    return;
   }
+
 
 
 }
