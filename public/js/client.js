@@ -119,6 +119,7 @@ var scheduler = {
     this.timeline.setGroups(this.visGroups);
     this.timeline.setItems(this.visItems);
     this.timeline.on('select',this.edit_item);
+    this.timeline.on('rangechange',this.drag_timeline);
 
   },
 
@@ -176,6 +177,31 @@ var scheduler = {
     return items;
   },
 
+  // gets called when user zooms and moves timeline
+  drag_timeline_timeout: false,
+  drag_timeline: function(evt){
+    var rate=20;
+    if (scheduler.drag_timeline_timeout==false){
+      scheduler.drag_timeline_timeout=setTimeout(scheduler.drag_timeline_cb,rate);
+      scheduler.drag_timeline_real();
+    }
+    return true;
+  },
+  // rate-limiting gets called by drag_timeline
+  drag_timeline_real: function(){
+    if ( $("#popover-edit").is(":visible") && scheduler.edit_new_item==false ) {
+      var open_elem=$(".item.selected > .content").parent();
+      scheduler.popover("#popover-edit",open_elem);
+    }
+  },
+  // gets called by drag-timeline-timeout to reset rate limiting to zero
+  drag_timeline_cb: function(){
+    console.log('clear')
+    clearTimeout(scheduler.drag_timeline_timeout);
+    scheduler.drag_timeline_timeout=false;
+  },
+
+
 
   // gets called when a user drags an item around
   drag_item: function(item){
@@ -201,7 +227,7 @@ var scheduler = {
         $("#edit-duration").val(dur_calc);
       }
     }
-    
+
     //scheduler.api.save(item);
     return true;
   },
@@ -476,7 +502,7 @@ var scheduler = {
     scheduler.visItems.add(visItem);
     scheduler.update_group_background(visItem.group);
     scheduler.popover_hide("#popover-edit");
-
+    scheduler.timeline.setSelection(visItem.id);
     //scheduler.api.save(visItem)
 
     scheduler.edit_new_item=false;
