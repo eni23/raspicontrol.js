@@ -54,7 +54,7 @@
         <div class="arrow"></div>
         <h3 class="popover-title">
           <span class="close" data-dismiss="popover-x">&times;</span>
-          <b>Edit</b>
+          <b id='edit-popover-title'>Edit</b>
         </h3>
         <div class="popover-content">
 
@@ -97,7 +97,6 @@
               </div>
             </div>
 
-            
             <div class="row row-popover edit-row-duration">
               <div class="col-md-3">
                 Duration:
@@ -107,17 +106,24 @@
               </div>
             </div>
 
-            
-            <div class="row row-popover edit-item-delarea">
+            <div class="row row-popover edit-item-delarea" id="edit-item-delbutton">
               <div class="col-md-12">
                 <button class="btn btn-sm btn-danger">
                   <span class="glyphicon mdi-action-delete" title="delete this item"></span> Delete this Item
                 </button>
               </div>
             </div>
-            
+
+            <div class="row row-popover edit-item-addarea">
+              <div class="col-md-12">
+                <button class="btn btn-sm btn-primary" id="edit-item-addbuton">
+                  <span class="glyphicon glyphicon-ok" title="delete this item"></span> Add this Item
+                </button>
+              </div>
+            </div>
 
         </div>
+
     </div>
 		
 		<script src="/lib/jquery/jquery.min.js"></script>

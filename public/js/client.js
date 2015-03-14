@@ -30,9 +30,10 @@ var scheduler = {
   timeline: false,
   visGroups: [],
   visItems: [],
+  lastid: 8,
 
 
-
+  // main entry point gets called after document.ready is triggered
   init: function(){
     this.render(demodata);
     this.init_timeline();
@@ -44,9 +45,18 @@ var scheduler = {
     // edit popover change type
     $(".popover-edit-type > div > label").click(this.edit_change_type);
     $(".popover-edit input").on("input", this.edit_change_form);
-    $(".colorsel").on('click touch tap',function(){
-      scheduler.popover('#popover-color',$(this))
-    });
+    
+    //$(".colorsel").on('click touch tap',function(){
+    //  scheduler.popover('#popover-color',$(this))
+    //});
+    
+    // delete item button
+    $("#edit-item-delbutton").click(this.delete_item);
+
+    // add new item button
+    $("#edit-item-addbuton").click(this.add_new_item);
+
+
   },
 
   // init visjs timeline
@@ -71,7 +81,7 @@ var scheduler = {
                 day: ' '
             }
         },
-        /*onAdd: addItem,*/
+        onAdd: scheduler.new_item,
         onMoving: scheduler.drag_item
     };
     this.timeline = new vis.Timeline(container);
@@ -79,8 +89,7 @@ var scheduler = {
     this.timeline.setGroups(this.visGroups);
     this.timeline.setItems(this.visItems);
     this.timeline.on('select',this.edit_item);
-    //this.timeline.on('rangechange',scheduler.update_timeline_background)
-    //setTimeout(scheduler.testcb,1500)
+
   },
 
 
@@ -105,7 +114,7 @@ var scheduler = {
       var item=data.schedules[k];
       var visItem={
         id:item.id,
-        /*content:item.name,*/
+        content:'',
         start: today + ' ' + item.time,
         group: item.device,
         className: item.type,
@@ -122,11 +131,12 @@ var scheduler = {
 
   },
 
-  //
+  // function for sorting visItems by time
   visTimesort: function(a,b){
     return new Date(a.start).getTime() - new Date(b.start).getTime();
   },
 
+  // get all items of a group
   get_group_items: function(group){
     var items = scheduler.visItems.get({
             filter: function (item) {
@@ -137,18 +147,34 @@ var scheduler = {
   },
 
 
+  // gets called when a user drags an item around
   drag_item: function(item){
     scheduler.visItems.update(item)
     scheduler.update_group_background(item.group)
+
+    // if edit-tooltip is open, update time and move tooltip too
+    if ( $("#popover-edit").is(":visible") ) {
+      var moving_elem=$(".item.selected > .content").parent();
+      var newtime=moment(item.start).format('HH:mm');
+      scheduler.popover("#popover-edit",moving_elem);
+      $("#edit-start").val(newtime);
+      $("#popover-edit").data(item)
+    } 
+    
     //scheduler.api.save(item);
+    return true;
+
   },
 
+  // update background of all groups
   update_background: function(){
     this.visGroups.get().forEach(function(group){
       scheduler.update_group_background(group.id);
     });
   },
 
+
+  // update background of specific group
   update_group_background: function(group){
 
     var groupitems=this.get_group_items(group);
@@ -156,7 +182,6 @@ var scheduler = {
     var background=[];
     var delitems=[];
     var groupstr='group_'+group;
-
 
     var is_on=false;
     for (k in sorted){
@@ -183,6 +208,7 @@ var scheduler = {
       }
 
       else if (item.origData.type=='off'){
+        if (!is_on) continue;
         if (last.end) continue;
         is_on=false;
         last.end=item.start;
@@ -208,12 +234,16 @@ var scheduler = {
       }
     }
 
-    last=background[background.length-1];
-    if (!last.end){
-      last.end=today+" "+"24:00";
+    // fill up ends
+    for (k in background){
+      if (!background[k].end){
+        background[k].end=today+" "+"24:00";
+      }
     }
+
     this.visItems.remove(delitems);
     this.visItems.update(background);
+
     return true;
   },
 
@@ -221,11 +251,16 @@ var scheduler = {
 
   // gets called if user doubleclicks on a new
   // TODO: better popover placement
+
   edit_item: function(evt){
   
     if (evt.items.length == 1 ){
-      var requested_item=scheduler.visItems.get(evt.items[0]);
 
+
+      scheduler.edit_new_item=false;
+
+      var requested_item=scheduler.visItems.get(evt.items[0]);
+      
       // open on secound click
       if (scheduler.editid===false){
         scheduler.editid=requested_item;
@@ -246,7 +281,9 @@ var scheduler = {
       $("#popover-edit").data(item);
       $("#edit-type-"+item.origData.type).trigger('click');
       $("#edit-start").val(start);
-      $
+      $("#edit-popover-title").html('Edit');
+      $(".edit-item-delarea").show();
+      $(".edit-item-addarea").hide();
       $("#edit-duration").val(item.origData.duration)
       $('#edit-start').timepicker({
         showMeridian: false,
@@ -261,15 +298,19 @@ var scheduler = {
       scheduler.editid=false;
 
     }
+
     // hide popover if no item selected
-    else if (evt.items.length == 0){
-      scheduler.editid=false;
-      $('#popover-edit').popoverX('hide');
-    } 
+    //else if (evt.items.length == 0){
+    //  scheduler.editid=false;
+    //  $('#popover-edit').popoverX('hide');
+    //} 
+
   },
 
 
+  // gets called when user changes type in edit popover
   edit_change_type: function(evt){
+
 
 
     var item=$("#popover-edit").data();
@@ -280,9 +321,40 @@ var scheduler = {
       $(".edit-row-duration").hide();
     }
 
+    if (scheduler.edit_new_item) return true;
+
+
+    // TODO: better type detection
+    var type=this.className.split(' ')[3]
+    if (type==item.origData.type) return true;
+
+    item.origData.type=type;
+    item.className=type;
+    item.end=null;
+    item.type='box';
+
+    if (item.origData.type=='duration'){
+      var duration_val=$('#edit-duration').val();
+      if (isNaN(duration_val) || !duration_val){
+        duration_val=300;
+      }
+      var end=moment(item.start).add( parseInt(duration_val) , 'seconds').format('HH:mm');
+      item.end=end;
+      item.type='range';
+      item.origData.duration=duration_val;
+      $("#edit-duration").val(duration_val);
+    }
+
+    scheduler.visItems.update(item)
+    scheduler.update_group_background(item.group)
+
+    //scheduler.api.save(item)
+
   },
 
+  // gets called if user changes values in edit-popover input fields
   edit_change_form: function(evt){
+    if (scheduler.edit_new_item) return true;
     var item=$("#popover-edit").data();
     if ( $(this).hasClass('item-form-duration') ){
       var end=moment(item.start).add( parseInt($(this).val()) , 'seconds').format('HH:mm');
@@ -290,6 +362,89 @@ var scheduler = {
       //scheduler.visItems.update(item);
       scheduler.drag_item(item);
     }
+
+    //scheduler.api.save(item)
+  },
+
+  // delete item
+  // gets called if user clicks delete button on edit popover
+  delete_item: function(){
+    var item=$("#popover-edit").data();
+    scheduler.visItems.remove(item);
+    $("#popover-edit").data(false);
+    scheduler.popover_hide("#popover-edit");
+    scheduler.update_group_background(item.group);
+    //scheduler.api.delete(item)
+  },
+
+
+
+  // gets called if user tries to add new entry
+  edit_new_item: false,
+  new_item: function(evt){
+    
+    var start=moment(evt.start).format('HH:mm');
+
+    // prepare popover
+    scheduler.edit_new_item=true;
+    $("#edit-popover-title").html('New Item');
+    $(".edit-item-delarea").hide();
+    $(".edit-item-addarea").show();
+    scheduler.popover("#popover-edit");
+
+    $("#edit-type-on").trigger('click');
+    $("#edit-duration").val('300');
+    $("#edit-start").val(start)
+
+    $("#popover-edit").data(evt);
+
+  },
+
+  // gets called if user clicks 'add new item' in new item dialog
+  add_new_item: function(){
+
+    var item=$("#popover-edit").data();
+
+    // TODO: better type detection
+    var type=$(".popover-edit-type label.active").get(0).className.split(' ')[3];
+    
+    // TODO: get id from api
+    var origData={
+        "id": scheduler.lastid,
+        "device": item.group,
+        "type": type,
+        "time": $("#edit-start").val(),
+        "duration": false
+    };
+
+    var visItem={
+      content:'',
+      id: scheduler.lastid,
+      start: today + ' ' + $("#edit-start").val(),
+      group: item.group,
+      className: type,
+      type: 'box',
+      origData:origData
+    }
+
+    if (type=='duration'){
+     var end=moment(today+' '+origData.time).add( parseInt($("#edit-duration").val()) , 'seconds').format('HH:mm');
+     visItem.end=today+' '+end;
+     visItem.type='range';
+     origData.duration=parseInt($("#edit-duration").val());
+    }
+
+    scheduler.lastid++;
+
+    scheduler.visItems.add(visItem);
+    $("#popover-edit").data(false);
+    scheduler.popover_hide("#popover-edit");
+
+    scheduler.update_group_background(visItem.group);
+    //scheduler.api.save(visItem)
+
+    scheduler.edit_new_item=false;
+    
   },
 
 
@@ -323,15 +478,17 @@ var scheduler = {
     return elem;
   },
 
-  // gets called if user tries to add new entry
-  new_item: function(){
-
+  popover_hide: function(selector){
+    $(selector).popoverX('hide');
   },
+
 
 
   clickpos: {},
   update_clickpos: function(evt){
-    scheduler.clickpos={ top: evt.pageY, left: evt.pageX };
+    if (evt.pageX && evt.pageX){
+      scheduler.clickpos={ top: evt.pageY, left: evt.pageX };
+    }
   }
 
 
@@ -342,5 +499,4 @@ var scheduler = {
 
 $(document).ready(function () {
     scheduler.init();
-    //$('.main-tooltip').popoverClosable({ html: true });
 });
