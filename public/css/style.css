@@ -49,11 +49,25 @@ div.timetable-device {
   width: 80px;
 }
 
+div.timetable-device div.colorsel {
+  width:15px;
+  height: 15px;
+  border-radius: 7.5px;
+  display: block;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border:1px solid;
+  border-color: #ccc ! important;
+  box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+}
+
 div.timetable-device div.icon {
   padding-top: 10px;
   font-size: 40px;
   text-align: center;
 }
+
 div.timetable-device div.devicename {
   font-size: 16px;
   font-weight: bold;

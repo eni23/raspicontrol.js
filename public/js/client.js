@@ -39,11 +39,14 @@ var scheduler = {
     this.update_background();
     
 
-    $(document).on('click',this.update_clickpos);
+    $(document).on('click touch tap',this.update_clickpos);
 
     // edit popover change type
     $(".popover-edit-type > div > label").click(this.edit_change_type);
     $(".popover-edit input").on("input", this.edit_change_form);
+    $(".colorsel").on('click touch tap',function(){
+      scheduler.popover('#popover-color',$(this))
+    });
   },
 
   // init visjs timeline
@@ -90,11 +93,11 @@ var scheduler = {
       var visItem={
         id: item.id,
         className: 'group_'+item.id,
-        content: '<div class="timetable-device"><div class="icon"><span class="glyphicon glyphicon-'+item.icon+'" aria-hidden="true"></span></div><div class="devicename">'+item.name+'</div></div>'
+        content: '<div class="timetable-device"><div class="icon"><span class="glyphicon glyphicon-'+item.icon+'" aria-hidden="true"></span></div><div class="devicename">'+item.name+'</div><div class="colorsel bg-group_'+item.id+' bg-gradient-group_'+item.id+'"></div></div>'
       };
       //style stuff
       var darker=modcolor(item.color,-25);
-      $("<style>").prop("type", "text/css").html('.vis.timeline .group_'+item.id+' .item { background-color:'+item.color+'; } .vis.timeline .group_'+item.id+' .item.selected  { background-color:'+darker+'; }').appendTo('head');
+      $("<style>").prop("type", "text/css").html('.vis.timeline .group_'+item.id+' .item, .bg-group_'+item.id+' { background-color:'+item.color+'; } .vis.timeline .group_'+item.id+' .item.selected  { background-color:'+darker+'; } .bg-gradient-group_'+item.id+' { linear-gradient(to bottom,#fff 0,'+item.color+' 100%); }').appendTo('head');
       this.devices.push(visItem);
     }
     // schedules
@@ -198,7 +201,7 @@ var scheduler = {
       }
 
       else if (item.origData.type=='duration'){
-        is_on=true;
+        //is_on=true;
         bgtemplate.start=item.start;
         bgtemplate.end=item.end;
         background.push(bgtemplate);
@@ -291,13 +294,13 @@ var scheduler = {
 
 
 
-  popover: function(selector, target){
+  popover: function(selector, target, placement, no_positioning){
     var elem=$(selector);
     if (typeof target == 'undefined') {
-      var target=$('#popover-placement');
-      var newpos={
-        top: scheduler.clickpos.top,
-        left: scheduler.clickpos.left - ( elem.width() / 2)
+     var target=$('#popover-placement');
+     var newpos={
+      top: scheduler.clickpos.top,
+      left: scheduler.clickpos.left - ( elem.width() / 2)
       }
     } 
     else {
@@ -307,10 +310,18 @@ var scheduler = {
         left: offset.left - ( elem.width() / 2) + ( target.width() * 0.75 ) 
       }
     } 
-    elem.popoverX({ target:target, placement:'bottom' });
-    elem.popoverX('show').offset(newpos);
-  },
+    if (typeof placement == 'undefined') {
+      placement='bottom';
+    }
 
+    elem.popoverX({ target:target, placement:placement });
+    elem.popoverX('show')
+    if (typeof no_positioning != 'undefined'){
+      if (no_positioning==true) return elem;
+    }
+    elem.offset(newpos);
+    return elem;
+  },
 
   // gets called if user tries to add new entry
   new_item: function(){
