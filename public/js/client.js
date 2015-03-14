@@ -248,17 +248,13 @@ var scheduler = {
   },
 
 
-
-  // gets called if user doubleclicks on a new
-  // TODO: better popover placement
-
+  // open edit popover
+  // gets called if click/tap twice on existing item
   edit_item: function(evt){
   
     if (evt.items.length == 1 ){
 
-
       scheduler.edit_new_item=false;
-
       var requested_item=scheduler.visItems.get(evt.items[0]);
       
       // open on secound click
@@ -273,7 +269,6 @@ var scheduler = {
         scheduler.editid=requested_item;
         return true;
       }
-
 
       var item=scheduler.visItems.get(evt.items[0]);
       var start=moment(item.start).format('HH:mm');
@@ -291,7 +286,6 @@ var scheduler = {
         showInputs: false,
         minuteStep: 1,
       });
-
 
       var timeline_elem=$(".item.selected > .content").parent();
       scheduler.popover('#popover-edit',timeline_elem)
@@ -311,8 +305,6 @@ var scheduler = {
   // gets called when user changes type in edit popover
   edit_change_type: function(evt){
 
-
-
     var item=$("#popover-edit").data();
     if ($(this).hasClass("duration")){
         $(".edit-row-duration").show();
@@ -322,7 +314,6 @@ var scheduler = {
     }
 
     if (scheduler.edit_new_item) return true;
-
 
     // TODO: better type detection
     var type=this.className.split(' ')[3]
@@ -437,14 +428,14 @@ var scheduler = {
     scheduler.lastid++;
 
     scheduler.visItems.add(visItem);
-    $("#popover-edit").data(false);
+    scheduler.update_group_background(visItem.group);
     scheduler.popover_hide("#popover-edit");
 
-    scheduler.update_group_background(visItem.group);
     //scheduler.api.save(visItem)
 
     scheduler.edit_new_item=false;
-    
+    $("#popover-edit").data(false);
+
   },
 
 
@@ -479,13 +470,15 @@ var scheduler = {
   },
 
   popover_hide: function(selector){
-    $(selector).popoverX('hide');
+    return $(selector).popoverX('hide');
   },
 
 
 
+  // store touch/cklick-position, gets triggered on every elem on document
   clickpos: {},
   update_clickpos: function(evt){
+    // is click
     if (evt.pageX && evt.pageX){
       scheduler.clickpos={ top: evt.pageY, left: evt.pageX };
     } 
@@ -496,7 +489,6 @@ var scheduler = {
       var touch=evt.originalEvent.gesture.touches[0];
       scheduler.clickpos={ top: touch.pageY, left: touch.pageX };
     }
-    console.log(scheduler.clickpos)
     return;
   }
 
