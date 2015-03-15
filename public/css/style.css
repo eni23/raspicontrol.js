@@ -111,15 +111,16 @@ div.item.range.duration {
  font-family: 'Glyphicons Halflings' ! important;
  min-width: 24px ! important;
  text-align: center;
+ box-shadow: inset 0 3px 5px rgba(0,0,0,.125) ! important;
+ border-radius: 3px ! important;
 }
+
 div.item.range.duration:before, .icon-action-duration:before{
   content: "\e120";
   color: #000000 ! important;
 }
 
-div.item.range.duration, .icon-action-duration:before{
-  border-radius: 3px ! important;
-}
+
 
 .vis.timeline div.group div.background {
 	opacity: 0.3;

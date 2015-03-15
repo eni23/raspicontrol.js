@@ -92,21 +92,24 @@ var scheduler = {
   // api
   // TODO: move to own file
   api: {
-
     queue:[],
     call_timeout:false,
-
     clear_rate_callback: function(){
 
     },
+    run: function(){
 
+    },
+    queue: function(item){
 
+    },
+    dequeue: function(){
 
+    },
     save: function(item){
       var rate=50;
       console.log('api-save');
     },
-
     add: function(item){
       var rate=0;
       console.log('api-add');
@@ -166,7 +169,7 @@ var scheduler = {
       };
       //style stuff
       var darker=modcolor(item.color,-25);
-      $("<style>").prop("type", "text/css").html('.vis.timeline .group_'+item.id+' .item, .bg-group_'+item.id+' { background-color:'+item.color+'; } .vis.timeline .group_'+item.id+' .item.selected  { background-color:'+darker+'; } .bg-gradient-group_'+item.id+' { linear-gradient(to bottom,#fff 0,'+item.color+' 100%); }').appendTo('head');
+      $("<style>").prop("type", "text/css").html('.vis.timeline .group_'+item.id+' .item, .bg-group_'+item.id+' { background-color:'+item.color+'; } .vis.timeline .group_'+item.id+' .item.selected  { background-color:'+darker+'; }').appendTo('head');
       this.devices.push(visItem);
     }
     // schedules
@@ -185,6 +188,7 @@ var scheduler = {
        var end=moment(today+' '+item.time).add( parseInt(item.duration) , 'seconds').format('HH:mm');
        visItem.end=today+' '+end;
        visItem.type='range';
+       visItem.className=item.type+' bg-group_'+item.device;
       }
       this.schedules.push(visItem);
     }
