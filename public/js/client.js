@@ -45,47 +45,66 @@ todayEnd.setHours(24, 0, 0, 0);
 
 
 
+/**
+ * raspicontrol.js
+ * https://github.com/eni23/raspicontrol.js
+ *
+ * Timer-App GUI 
+ * edit timers via rich graphical interface
+ *
+ * @author  Cyrill von Wattenwyl < eni@e23.ch >
+ * @date    2015-03-15
+ *
+ * @license
+ * Copyright (C) 2011-2014 Almende B.V, http://almende.com
+ *
+ * WHATEVER, MAN - license
+ *
+ */
 
+var timer = {
 
-// client editor 
-var scheduler = {
-
-  
-  self: this,
 
   // placeholders
-  devices: [],
-  schedules: [],
   editid: false,
   timeline: false,
-  visGroups: [],
-  visItems: [],
+  groups: [],
+  timers: [],
   lastid: 8,
 
-
-  // main entry point gets called after document.ready is triggered
+  /**
+   * main entry point gets called after document.ready is triggered
+   *
+   * @returns none
+   */
   init: function(){
+    
+    // init timeline & fetch data
     this.render(demodata);
     this.init_timeline();
     this.update_background();
-    
 
+    // set event hanlers
+
+    // store click/touch-position for popover:new 
     $(document).on('click tap',this.update_clickpos);
 
-    // edit popover change type
+    // edit/new-popover: change type
     $(".popover-edit-type > div > label").click(this.edit_change_type);
+
+    //popover:edit change input value
     $(".popover-edit input").on("change", this.edit_change_form);
-    
+
+    // device click on small round color-button
     $(".colorsel").on('click touch tap',function(){
-      scheduler.popover('#popover-color',$(this))
+      timer.popover('#popover-color',$(this))
     });
-    
-    // delete item button
+
+    // popover:edit delete item button
     $("#edit-item-delbutton").click(this.delete_item);
 
-    // add new item button
+    // popover:new add new item button
     $("#edit-item-addbuton").click(this.add_new_item);
-
 
   },
 
@@ -121,60 +140,91 @@ var scheduler = {
   },
 
 
-  // init visjs timeline
+  /**
+   * prepare visjs-Timeline
+   *
+   * @returns none
+   */
   init_timeline: function(){
-    this.visGroups = new vis.DataSet(this.devices);
-    this.visItems = new vis.DataSet(this.schedules);
     var container = document.getElementById('visualization');
     var options = {
-        /*height: 300,*/
-        min: todayStart,
-        max: todayEnd,
-        orientation: top,
-        editable: {
-            add: true,
-            updateTime: true,
-            updateGroup: false,
-            remove: false
-        },
-        format: {
-            minorLabels: {
-                weekday: '',
-                day: ' '
-            }
-        },
-        onAdd: scheduler.new_item,
-        onMoving: scheduler.drag_item
+      min: todayStart,
+      max: todayEnd,
+      orientation: top,
+      editable: {
+        add: true,
+        updateTime: true,
+        updateGroup: false,
+        remove: false
+      },
+      format: {
+        minorLabels: {
+          weekday: '',
+          day: ' '
+        }
+      },
+      onAdd: timer.new_item,
+      onMoving: timer.drag_item
     };
     this.timeline = new vis.Timeline(container);
     this.timeline.setOptions(options);
-    this.timeline.setGroups(this.visGroups);
-    this.timeline.setItems(this.visItems);
+    this.timeline.setGroups(this.groups);
+    this.timeline.setItems(this.timers);
     this.timeline.on('select',this.edit_item);
     this.timeline.on('rangechange',this.drag_timeline);
-
   },
 
 
+  /**
+   * main entry point gets called after document.ready is triggered
+   *
+   * @returns none
+   */
   // render data from api
   render: function(data){
 
-    // groups (aka devices)
+    var timers=[];
+    var devices=[];
+
+    // insert placeholder for stlyes
+    $("<style>").prop("type", "text/css")
+                .attr("id","_devices-generated-styles")
+                .html('/* generated */')
+                .appendTo('head');
+
+    // loop over all groups (aka devices)
     for(var k in data.devices) {
-      var item=data.devices[k];
+      var item = data.devices[k];
+      var content = '<div class="timetable-device">'
+                  + ' <div class="icon">'
+                  + '  <span class="glyphicon glyphicon-'+item.icon+'" aria-hidden="true"></span>'
+                  + ' </div>'
+                  + ' <div class="devicename">'+item.name+'</div>'
+                  + ' <div class="colorsel bg-group_'+item.id+'"></div>'
+                  + '</div>'
+                  ;
+
       var visItem={
         id: item.id,
         className: 'group_'+item.id,
-        content: '<div class="timetable-device"><div class="icon"><span class="glyphicon glyphicon-'+item.icon+'" aria-hidden="true"></span></div><div class="devicename">'+item.name+'</div><div class="colorsel bg-group_'+item.id+' bg-gradient-group_'+item.id+'"></div></div>'
+        content: content
       };
-      //style stuff
+      // generate css-classes for group
       var darker=modcolor(item.color,-25);
-      $("<style>").prop("type", "text/css").html('.vis.timeline .group_'+item.id+' .item, .bg-group_'+item.id+' { background-color:'+item.color+'; } .vis.timeline .group_'+item.id+' .item.selected  { background-color:'+darker+'; }').appendTo('head');
-      this.devices.push(visItem);
+      var g=item.id;
+      var style = '.vis.timeline .group_'+g+' .item, .bg-group_'+g+' {'
+                + '  background-color:'+item.color+'; '
+                + '} .vis.timeline .group_'+item.id+' .item.selected  { '
+                + '  background-color:'+darker+'; '
+                + '}'
+                ;
+
+      $("#_devices-generated-styles").append(style);
+      devices.push(visItem);
     }
-    // schedules
-    for(var k in data.schedules) {
-      var item=data.schedules[k];
+    // loop over all timers and generate visItems
+    for(var k in data.timers) {
+      var item=data.timers[k];
       var visItem={
         id:item.id,
         content:'',
@@ -189,56 +239,101 @@ var scheduler = {
        visItem.end=today+' '+end;
        visItem.type='range';
        visItem.className=item.type+' bg-group_'+item.device;
-      }
-      this.schedules.push(visItem);
+     }
+     timers.push(visItem);
     }
 
+    // genetate timeline datasets
+    this.groups = new vis.DataSet(devices);
+    this.timers = new vis.DataSet(timers);
   },
 
-  // function for sorting visItems by time
-  visTimesort: function(a,b){
+
+  /**
+   * function for sorting timers by time
+   *
+   * @param {*} a             date a
+   * @param {*} b             date b
+   * @returns {int}           bigger or smaller
+   */
+  sort_by_time: function(a,b){
     return new Date(a.start).getTime() - new Date(b.start).getTime();
   },
 
-  // get all items of a group
+
+  /**
+   * get all items of a group
+   *
+   * @param {string}  group     group name
+   * @returns {visItems}        array of visItems
+   */
   get_group_items: function(group){
-    var items = scheduler.visItems.get({
-            filter: function (item) {
-              return item.group == group;
-            }
-          });
+    var items = timer.timers.get({
+      filter: function (item) {
+        return item.group == group;
+      }
+    });
     return items;
   },
 
-  // move popover 
-  // gets called when user zooms and moves timeline, moving item
-  // simple rate-limiting
-  move_open_popover_timeout: false,
+
+  /**
+   * main entry point gets called after document.ready is triggered
+   * rate=action triggered only every n millisecounds
+   *
+   * @returns {boolean}       allways true
+   */
   move_open_popover: function(){
     var rate=20;
-    if (scheduler.move_open_popover_timeout==false){
-      scheduler.move_open_popover_timeout=setTimeout(scheduler.move_open_popover_cb,rate);
-      scheduler.move_open_popover_action()
+    if (timer.move_open_popover_timeout==false){
+      timer.move_open_popover_timeout=setTimeout(timer.move_open_popover_cb,rate);
+      timer.move_open_popover_action()
     }
     return true;
   },
-  // gets called by drag-timeline-timeout to reset rate limiting to zero
+
+  // placeholder fot popover-move-ratelimit-timeout
+  move_open_popover_timeout: false,
+
+
+  /**
+   * popover-move-ratelimit: clear limit
+   *
+   * @returns none
+   */
   move_open_popover_cb: function(){
-    clearTimeout(scheduler.move_open_popover_timeout);
-    scheduler.move_open_popover_timeout=false;
+    clearTimeout(timer.move_open_popover_timeout);
+    timer.move_open_popover_timeout=false;
   },
-  // the real moving
+
+
+  /**
+   * popover-move-ratelimit: move popup
+   *
+   * @returns {boolean}       allways true
+   */ 
   move_open_popover_action: function(){
-    if ( $("#popover-edit").is(":visible") && scheduler.edit_new_item==false ) {
-      scheduler.popover_move("#popover-edit");
+    if ( $("#popover-edit").is(":visible") && timer.edit_new_item==false ) {
+      timer.popover_move("#popover-edit");
     }
     return true;
   },
 
-  // gets called if user zooms and drags timeline
-  drag_timeline: function(){ scheduler.move_open_popover(); },
 
-  // gets called when a user drags an item around
+  /**
+   * gets called if user zooms and drags timeline
+   *
+   * @returns none
+   */
+  drag_timeline: function(){ timer.move_open_popover(); },
+
+
+  /**
+   * gets called when a user drags an item around
+   *
+   * @param {visItem} item    visDataset-item
+   * @returns {boolean}       allways true
+   */ 
   drag_item: function(item){
 
     // if type is duration calculate secounds
@@ -246,8 +341,8 @@ var scheduler = {
       var dur_calc=( item.end-item.start ) / 1000;
       item.origData.duration = dur_calc;
     }
-    scheduler.visItems.update(item)
-    scheduler.update_group_background(item.group)
+    timer.timers.update(item)
+    timer.update_group_background(item.group)
 
     // if edit-tooltip is open, update time and move tooltip too
     if ( $("#popover-edit").is(":visible") ) {
@@ -258,27 +353,37 @@ var scheduler = {
       if ( item.origData.type=='duration'){
         $("#edit-duration").val(dur_calc);
       }
-      scheduler.popover_move("#popover-edit");
+      timer.popover_move("#popover-edit");
     }
 
-    scheduler.api.save(item);
+    timer.api.save(item);
     return true;
   },
 
 
-  // update background of all groups
+  /**
+   * update background of all groups
+   *
+   * @returns none
+   */
   update_background: function(){
-    this.visGroups.get().forEach(function(group){
-      scheduler.update_group_background(group.id);
+    this.groups.get().forEach(function(group){
+      timer.update_group_background(group.id);
     });
   },
 
 
-  // update background of specific group
+  /**
+   * update background of specific group
+   *
+   * @param {string} group   the name of the group/deivce
+   * @returns {boolean}      allways true
+   */
+  // 
   update_group_background: function(group){
 
     var groupitems=this.get_group_items(group);
-    var sorted=groupitems.sort(this.visTimesort);
+    var sorted=groupitems.sort(this.sort_by_time);
     var background=[];
     var delitems=[];
     var groupstr='group_'+group;
@@ -340,36 +445,40 @@ var scheduler = {
       }
     }
 
-    this.visItems.remove(delitems);
-    this.visItems.update(background);
+    this.timers.remove(delitems);
+    this.timers.update(background);
 
     return true;
   },
 
 
-  // open edit popover
-  // gets called if click/tap twice on existing item
+  /**
+   * open edit popover
+   * gets called if click/tap twice on existing item
+   *
+   * @returns none
+   */
   edit_item: function(evt){
-  
+
     if (evt.items.length == 1 ){
 
-      scheduler.edit_new_item=false;
-      var requested_item=scheduler.visItems.get(evt.items[0]);
+      timer.edit_new_item=false;
+      var requested_item=timer.timers.get(evt.items[0]);
       
       // open on secound click
-      if (scheduler.editid===false){
-        scheduler.editid=requested_item;
+      if (timer.editid===false){
+        timer.editid=requested_item;
         return true;
       }
 
       // click on a different item
-      if (scheduler.editid.id != requested_item.id ){
+      if (timer.editid.id != requested_item.id ){
         $('#popover-edit').popoverX('hide');
-        scheduler.editid=requested_item;
+        timer.editid=requested_item;
         return true;
       }
 
-      var item=scheduler.visItems.get(evt.items[0]);
+      var item=timer.timers.get(evt.items[0]);
       var start=moment(item.start).format('HH:mm');
 
       $("#popover-edit").data(item);
@@ -387,32 +496,36 @@ var scheduler = {
       });
 
       var timeline_elem=$(".item.selected > .content").parent();
-      scheduler.popover('#popover-edit',timeline_elem)
-      scheduler.editid=false;
+      timer.popover('#popover-edit',timeline_elem)
+      timer.editid=false;
 
     }
 
     // hide popover if no item selected
     //else if (evt.items.length == 0){
-    //  scheduler.editid=false;
+    //  timer.editid=false;
     //  $('#popover-edit').popoverX('hide');
     //} 
 
   },
 
 
-  // gets called when user changes type in edit popover
+  /**
+   * gets called when user changes type in edit popover
+   *
+   * @returns {boolean}      allways true
+   */
   edit_change_type: function(evt){
 
     var item=$("#popover-edit").data();
     if ($(this).hasClass("duration")){
-        $(".edit-row-duration").show();
+      $(".edit-row-duration").show();
     }
     else {
       $(".edit-row-duration").hide();
     }
 
-    if (scheduler.edit_new_item) return true;
+    if (timer.edit_new_item) return true;
 
     // TODO: better type detection
     var type=this.className.split(' ')[3]
@@ -435,23 +548,28 @@ var scheduler = {
       $("#edit-duration").val(duration_val);
     }
 
-    scheduler.visItems.update(item);
-    scheduler.update_group_background(item.group);
-    scheduler.timeline.setSelection(item.id);
-    scheduler.popover_recalc("#popover-edit", $(".item.selected > .content").parent() );
+    timer.timers.update(item);
+    timer.update_group_background(item.group);
+    timer.timeline.setSelection(item.id);
+    timer.popover_recalc("#popover-edit", $(".item.selected > .content").parent() );
     
-    scheduler.api.save(item)
+    timer.api.save(item)
 
+    return true;
   },
 
-  // gets called if user changes values in edit-popover input fields
-  edit_change_count:0,
+
+  /**
+   * gets called if user changes values in edit-popover input fields
+   *
+   * @returns {boolean}      allways true
+   */
   edit_change_form: function(evt){
     // only on edit
-    if (scheduler.edit_new_item) return true;
+    if (timer.edit_new_item) return true;
     // discard first 2 events 
-    scheduler.edit_change_count++;
-    if (scheduler.edit_change_count<3) return;
+    timer.edit_change_count++;
+    if (timer.edit_change_count<3) return;
 
     var formid=evt.delegateTarget.id;
     var item=$("#popover-edit").data();
@@ -460,7 +578,7 @@ var scheduler = {
       var end = moment(item.start).add( parseInt($(this).val()) , 'seconds').format('HH:mm');
       item.end = today + " " + end;
       item.origData.duration = $("#edit-duration").val();
-      scheduler.drag_item(item);
+      timer.drag_item(item);
       return true;
     }
 
@@ -468,43 +586,65 @@ var scheduler = {
       var dat=moment(today+" "+$("#edit-start").val());
       item.origData.time = dat.format('HH:mm');
       item.start=dat;
-      // only save and update bg, no move
-      scheduler.visItems.update(item);
-      scheduler.update_group_background(item.group);
-      scheduler.api.save(item);
+      // only save and update bg, no move, uncomment for move
+      //timer.drag_item(item);
+      //return true;
+      timer.timers.update(item);
+      timer.update_group_background(item.group);
+      timer.api.save(item);
       return true;
     }
     return true;
   },
 
-  // delete item
-  // gets called if user clicks delete button on edit popover
+  //placeholder for edit count
+  edit_change_count: 0,
+
+
+  /**
+   * delete item
+   * gets called if user clicks delete button on edit popover
+   * 
+   * @returns none
+   */
   delete_item: function(){
     var item=$("#popover-edit").data();
-    scheduler.visItems.remove(item);
+    timer.timers.remove(item);
     $("#popover-edit").data(false);
-    scheduler.popover_hide("#popover-edit");
-    scheduler.update_group_background(item.group);
-    scheduler.api.delete(item);
+    timer.popover_hide("#popover-edit");
+    timer.update_group_background(item.group);
+    timer.api.delete(item);
   },
 
-  // gets called if user tries to add new entry
-  edit_new_item: false,
+
+  /**
+   * gets called if user tries to add new entry
+   *
+   * @returns none
+   */
   new_item: function(evt){
     var start=moment(evt.start).format('HH:mm');
-    scheduler.edit_new_item=true;
+    timer.edit_new_item=true;
     $("#edit-popover-title").html('New Item');
     $(".edit-item-delarea").hide();
     $(".edit-item-addarea").show();
-    scheduler.popover("#popover-edit");
+    timer.popover("#popover-edit");
     $("#edit-type-on").trigger('click');
     $("#edit-duration").val('300');
     $("#edit-start").val(start)
     $("#popover-edit").data(evt);
 
   },
+  
+  // flag for popover
+  edit_new_item: false,
+  
 
-  // gets called if user clicks 'add new item' in new item dialog
+  /**
+   * gets called if user clicks 'add new item' in new item dialog
+   *
+   * @returns none;
+   */
   add_new_item: function(){
 
     var item=$("#popover-edit").data();
@@ -514,16 +654,16 @@ var scheduler = {
     
     // TODO: get id from api
     var origData={
-        "id": scheduler.lastid,
-        "device": item.group,
-        "type": type,
-        "time": $("#edit-start").val(),
-        "duration": false
+      "id": timer.lastid,
+      "device": item.group,
+      "type": type,
+      "time": $("#edit-start").val(),
+      "duration": false
     };
 
     var visItem={
       content:'',
-      id: scheduler.lastid,
+      id: timer.lastid,
       start: today + ' ' + $("#edit-start").val(),
       group: item.group,
       className: type,
@@ -536,32 +676,40 @@ var scheduler = {
      visItem.end=today+' '+end;
      visItem.type='range';
      origData.duration=parseInt($("#edit-duration").val());
-    }
+   }
 
-    scheduler.lastid++;
+   timer.lastid++;
 
-    scheduler.visItems.add(visItem);
-    scheduler.update_group_background(visItem.group);
-    scheduler.popover_hide("#popover-edit");
-    scheduler.timeline.setSelection(visItem.id);
-    
-    scheduler.api.add(visItem);
+   timer.timers.add(visItem);
+   timer.update_group_background(visItem.group);
+   timer.popover_hide("#popover-edit");
+   timer.timeline.setSelection(visItem.id);
 
-    scheduler.edit_new_item=false;
-    $("#popover-edit").data(false);
+   timer.api.add(visItem);
 
-  },
+   timer.edit_new_item=false;
+   $("#popover-edit").data(false);
+
+ },
 
 
-  _popovers: [],
+  /**
+   * main entry point gets called after document.ready is triggered
+   *
+   * @param {string}  selector        jQuery-Selector
+   * @param {object}  target          jQuery/DOM-element to bind popover
+   * @param {string}  placement       top, bottom, bottom-left etc,,
+   * @param {boolean} no_positioning  do not positioning popover
+   * @returns {object} jQuery-object
+   */
   popover: function(selector, target, placement, no_positioning){
     var elem=$(selector);
     if (typeof target == 'undefined') {
      var target=$('#popover-placement');
      var newpos={
-      top: scheduler.clickpos.top,
-      left: scheduler.clickpos.left - ( elem.width() / 2)
-      }
+      top: timer.clickpos.top,
+      left: timer.clickpos.left - ( elem.width() / 2)
+      };
     } 
     else {
       var offset=target.offset();
@@ -580,63 +728,91 @@ var scheduler = {
       if (no_positioning==true) return elem;
     }
     elem.offset(newpos);
-    scheduler.popover_recalc(elem,target);
+    timer.popover_recalc(selector,target);
     return elem;
   },
 
-  // store for faster moving
+  // placeholder for popover-positions
+  _popovers: [],
+
+
+  /**
+   * calculate popover & target width & height. when moving, the data doesnt need to be refreshed
+   *
+   * @param {string} selector jQuery-Selector
+   * @returns none
+   */
   popover_recalc: function(selector, target){
     var elem=$(selector);
-    scheduler._popovers[selector]=elem;
-    scheduler._popovers[selector]._target=target;
-    scheduler._popovers[selector]._width=elem.width();
-    scheduler._popovers[selector]._height=elem.height();
-    scheduler._popovers[selector]._targetwidth=target.width();
-    scheduler._popovers[selector]._targetheight=target.height();
+    timer._popovers[selector]=elem;
+    timer._popovers[selector]._target=target;
+    timer._popovers[selector]._width=elem.width();
+    timer._popovers[selector]._height=elem.height();
+    timer._popovers[selector]._targetwidth=target.width();
+    timer._popovers[selector]._targetheight=target.height();
   },
 
 
+  /**
+   * move popover. since the values are precalculated, its quite fast
+   *
+   * @param {string} selector jQuery-Selector
+   * @returns none
+   */
   popover_move: function(selector){
-    var offset = scheduler._popovers[selector]._target.offset();
+    var offset = timer._popovers[selector]._target.offset();
     var newpos={
-      top: offset.top + (scheduler._popovers[selector]._targetheight * 2),
-      left: offset.left - ( scheduler._popovers[selector]._width / 2) + ( scheduler._popovers[selector]._targetwidth * 0.75 ) 
+      top: offset.top + (timer._popovers[selector]._targetheight * 2),
+      left: offset.left - ( timer._popovers[selector]._width / 2) + ( timer._popovers[selector]._targetwidth * 0.75 ) 
     }
-    scheduler._popovers[selector].offset(newpos);
+    timer._popovers[selector].offset(newpos);
     return;
   },
 
+
+  /**
+   * hide popover and destroy calculated data
+   *
+   * @param {string} selector jQuery-Selector
+   * @returns {object}  jQuery-object
+   */
   popover_hide: function(selector){
-    scheduler._popovers[selector]=false;
+    timer._popovers[selector]=false;
     return $(selector).popoverX('hide');
   },
 
 
-
-  // store touch/cklick-position, gets triggered on every elem on document
-  clickpos: {},
+  /**
+   * store touch/cklick-position, gets triggered on every elem on document
+   *
+   * @param {Event} event   the triggered event
+   * @returns none
+   */
+  // 
   update_clickpos: function(evt){
     // is click
     if (evt.pageX && evt.pageX){
-      scheduler.clickpos={ top: evt.pageY, left: evt.pageX };
+      timer.clickpos={ top: evt.pageY, left: evt.pageX };
     } 
     // is touch or tap
     else {
       if (typeof evt.originalEvent == 'undefined') return;
       if (typeof evt.originalEvent.gesture.touches[0] == 'undefined') return;
       var touch=evt.originalEvent.gesture.touches[0];
-      scheduler.clickpos={ top: touch.pageY, left: touch.pageX };
+      timer.clickpos={ top: touch.pageY, left: touch.pageX };
     }
     return;
-  }
+  },
+
+  // placeholder for click-position
+  clickpos: {},
+
+};
 
 
-
-}
-
-
-
-
+/**
+ * start timer app after document is ready
+ **/
 $(document).ready(function () {
-    scheduler.init();
+    timer.init();
 });

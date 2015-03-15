@@ -1,249 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css">
-		<link rel="stylesheet" href="/lib/bootstrap/css/bootstrap-theme.min.css">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/lib/bootstrap/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="/lib/bootstrap-popover-x/bootstrap-popover-x.css">
-		<link rel='stylesheet' href='/lib/visjs/vis.css' />
+    <link rel='stylesheet' href='/lib/visjs/vis.css' />
     <link rel='stylesheet' href='/lib/material-icons/material-icons.css' />
     <link rel='stylesheet' href='/css/style.css' />
     <link rel="stylesheet" href="/lib/bootstrap-3-timepicker/css/bootstrap-timepicker.min.css" />
-		<style>
-		</style>
-	</head>
-	<body>
-		
+    <style>
+    </style>
+  </head>
+
+  <body>
+    <!--main navigation !-->
     <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">toggle Navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-            <a class="navbar-brand" href="#!"><span class="glyphicon glyphicon-signal"></span> test</a>
-          </div>
-          <div id="navbar" class="collapse navbar-collapse">
-              <ul class="nav navbar-nav">
-                    <li><a href="#!">Control</a></li>
-                    <li class="active"><a href="#!">Schedule</a></li>
-              </ul>
-            </div>
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">toggle Navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#!"><span class="glyphicon glyphicon-signal"></span> test</a>
         </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="#!">Control</a></li>
+            <li class="active"><a href="#!">Timer</a></li>
+          </ul>
+        </div>
+      </div>
     </nav>
-    
+
+    <!--default-target for popovers !-->
     <button id='popover-placement'></button>
 
+    <!-- visible timeline content goes here !-->
     <div id="visualization"></div>
-    
+
+    <!-- popover select device color !-->
     <div id="popover-color" class="popover popover-default popover-color">
-        <div class="arrow"></div>
-        <h3 class="popover-title">
-          <span class="close" data-dismiss="popover-x">&times;</span>
-          <b>Select color  </b>
-        </h3>
-        <div class="popover-content">
-          <div class="color-sel">
-            lalaala
+      <div class="arrow"></div>
+      <h3 class="popover-title">
+        <span class="close" data-dismiss="popover-x">&times;</span>
+        <b>Select color  </b>
+      </h3>
+      <div class="popover-content">
+        <div class="color-sel">
+          lalaala
+        </div>
+      </div>
+    </div>
+
+    <!-- popover edit & new item !-->
+    <div id="popover-edit" class="popover popover-default popover-edit">
+      <div class="arrow"></div>
+      <h3 class="popover-title">
+        <span class="close" data-dismiss="popover-x">&times;</span>
+        <b id='edit-popover-title'>Edit</b>
+      </h3>
+      <div class="popover-content">
+        <!-- type !-->
+        <div class="row row-popover">
+          <div class="col-md-3">
+            Type:
+          </div>
+          <div class="col-md-9 popover-edit-type">
+            <div class="btn-group" data-toggle="buttons">
+              <label class="btn btn-default btn-sm on">
+                <input type="radio" name="type" id="edit-type-on" autocomplete="off">
+                <span class="glyphicon icon-action-on"></span>
+              </label>
+              <label class="btn btn-default btn-sm off">
+                <input type="radio" name="type" id="edit-type-off" autocomplete="off">
+                <span class="glyphicon icon-action-off"></span>
+              </label>
+              <label class="btn btn-default btn-sm toggle">
+                <input type="radio" name="type" id="edit-type-toggle" autocomplete="off">
+                <span class="glyphicon icon-action-toggle"></span>
+              </label>
+              <label class="btn btn-default btn-sm duration">
+                <input type="radio" name="type" id="edit-type-duration" autocomplete="off">
+                <span class="glyphicon icon-action-duration"></span>
+              </label>
+            </div>
           </div>
         </div>
-    </div>
-
-    <div id="popover-edit" class="popover popover-default popover-edit">
-        <div class="arrow"></div>
-        <h3 class="popover-title">
-          <span class="close" data-dismiss="popover-x">&times;</span>
-          <b id='edit-popover-title'>Edit</b>
-        </h3>
-        <div class="popover-content">
-
-            <div class="row row-popover">
-              <div class="col-md-3">
-                Type:
-              </div>
-              <div class="col-md-9 popover-edit-type">
-                <div class="btn-group" data-toggle="buttons">
-                  <label class="btn btn-default btn-sm on">
-                    <input type="radio" name="type" id="edit-type-on" autocomplete="off">
-                    <span class="glyphicon icon-action-on"></span>
-                  </label>
-                  <label class="btn btn-default btn-sm off">
-                    <input type="radio" name="type" id="edit-type-off" autocomplete="off">
-                    <span class="glyphicon icon-action-off"></span>
-                  </label>
-                  <label class="btn btn-default btn-sm toggle">
-                    <input type="radio" name="type" id="edit-type-toggle" autocomplete="off">
-                    <span class="glyphicon icon-action-toggle"></span>
-                  </label>
-                  <label class="btn btn-default btn-sm duration">
-                    <input type="radio" name="type" id="edit-type-duration" autocomplete="off">
-                    <span class="glyphicon icon-action-duration"></span>
-                  </label>
-                </div>
-              </div>
+        <!-- start !-->
+        <div class="row row-popover">
+          <div class="col-md-3">
+            Start:
+          </div>
+          <div class="col-md-9">
+            <div class="input-group bootstrap-timepicker input-group-sm">
+              <input type="text" class="form-control" id="edit-start"  />
+              <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
             </div>
-
-            <div class="row row-popover">
-              <div class="col-md-3">
-                Start:
-              </div>
-              <div class="col-md-9">
-                <div class="input-group bootstrap-timepicker input-group-sm">
-                  <input type="text" class="form-control" id="edit-start"  />
-                  <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
-                </div>
-                
-              </div>
-            </div>
-
-            <div class="row row-popover edit-row-duration">
-              <div class="col-md-3">
-                Duration:
-              </div>
-              <div class="col-md-9">
-                <input type="number" id="edit-duration" class="form-control input-sm item-form-duration"  />
-              </div>
-            </div>
-
-            <div class="row row-popover edit-item-delarea" id="edit-item-delbutton">
-              <div class="col-md-12">
-                <button class="btn btn-sm btn-danger">
-                  <span class="glyphicon mdi-action-delete" title="delete this item"></span> Delete this Item
-                </button>
-              </div>
-            </div>
-
-            <div class="row row-popover edit-item-addarea">
-              <div class="col-md-12">
-                <button class="btn btn-sm btn-primary" id="edit-item-addbuton">
-                  <span class="glyphicon glyphicon-ok" title="delete this item"></span> Add this Item
-                </button>
-              </div>
-            </div>
-
+          </div>
         </div>
-
+        <!-- duration !-->
+        <div class="row row-popover edit-row-duration">
+          <div class="col-md-3">
+            Duration:
+          </div>
+          <div class="col-md-9">
+            <input type="number" id="edit-duration" class="form-control input-sm item-form-duration"  />
+          </div>
+        </div>
+        <!-- delete button, only visible when edit !-->
+        <div class="row row-popover edit-item-delarea" id="edit-item-delbutton">
+          <div class="col-md-12">
+            <button class="btn btn-sm btn-danger">
+              <span class="glyphicon mdi-action-delete" title="delete this item"></span> Delete this Item
+            </button>
+          </div>
+        </div>
+        <!-- create button, only visible when new !-->
+        <div class="row row-popover edit-item-addarea">
+          <div class="col-md-12">
+            <button class="btn btn-sm btn-primary" id="edit-item-addbuton">
+              <span class="glyphicon glyphicon-ok" title="delete this item"></span> Add this Item
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-		
-		<script src="/lib/jquery/jquery.min.js"></script>
+
+
+
+    <script src="/lib/jquery/jquery.min.js"></script>
     <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
     <script src="/lib/bootstrap-popover-x/bootstrap-popover-x.js"></script>
     <script src="/lib/bootstrap-3-timepicker/js/bootstrap-timepicker.js"></script>
     <script src="/lib/visjs/vis.js"></script>
-		<script src="/lib/moment.min.js"></script>
+    <script src="/lib/moment.min.js"></script>
     <script src="/js/client.js"></script>
 
 
+
     <script>
-
-   var demodata={
-
-    "schedules": [
-      {
-        "id": "a",
-        "name":"l1 on",
-        "device": "d-a",
-        "type": "on",
-        "time": "08:00",
-        "duration": false
-      },
-      {
-        "id": "b", 
-        "name":"l1 off",
-        "device": "d-a",
-        "type": "off",
-        "time": "19:00",
-        "duration": false
-      },
-      {
-        "id": "c",
-        "name":"l2 on",
-        "device": "d-b",
-        "type": "on",
-        "time": "09:00",
-        "duration": false
-      },
-      {
-        "id": "c1",
-        "name":"l2 toggle",
-        "device": "d-b",
-        "type": "toggle",
-        "time": "12:00",
-        "duration": false
-      },
-      {
-        "id": "c2",
-        "name":"l2 toggle2",
-        "device": "d-b",
-        "type": "toggle",
-        "time": "14:00",
-        "duration": false
-      },
-      {
-        "id": "d",
-        "name":"l2 off",
-        "device": "d-b",
-        "type": "off",
-        "time": "18:30",
-        "duration": false
-      },
-      {
-        "id": "e",
-        "device": "d-c",
-        "name":"water1",
-        "type": "duration",
-        "time": "09:40",
-        "duration": 300
-      },
-      {
-        "id": "f",
-        "device": "d-c",
-        "name":"water2",
-        "type": "duration",
-        "time": "15:40",
-        "duration": 200
-      },
-      {
-        "id": "g",
-        "name":"water3",
-        "device": "d-c",
-        "type": "duration",
-        "time": "20:41",
-        "duration": "600"
-      },
-
-
-    ],
-    "devices": [
-      {
-       "id": "d-a",
-       "name": "lamp 1",
-       "port": 1,
-       "icon": "cog",
-       "color": "#ffeb3b"
-      },
-      {
-        "id": "d-b",
-        "name": "lamp 2",
-        "port": 2,
-        "icon": "cog",
-        "color": "#ffc107"
-      },
-      {
-        "id": "d-c",
-        "port": 3,
-        "name": "water",
-        "icon": "tint",
-        "color": "#2196f3"
-      }
-    ],
-  };
-				
-
-		</script>
-	</body>
+      var demodata={
+        "timers": [
+          {
+            "id": "a",
+            "name":"l1 on",
+            "device": "d-a",
+            "type": "on",
+            "time": "08:00",
+            "duration": false
+          },
+          {
+            "id": "b", 
+            "name":"l1 off",
+            "device": "d-a",
+            "type": "off",
+            "time": "19:00",
+            "duration": false
+          },
+          {
+            "id": "c",
+            "name":"l2 on",
+            "device": "d-b",
+            "type": "on",
+            "time": "09:00",
+            "duration": false
+          },
+          {
+            "id": "c1",
+            "name":"l2 toggle",
+            "device": "d-b",
+            "type": "toggle",
+            "time": "12:00",
+            "duration": false
+          },
+          {
+            "id": "c2",
+            "name":"l2 toggle2",
+            "device": "d-b",
+            "type": "toggle",
+            "time": "14:00",
+            "duration": false
+          },
+          {
+            "id": "d",
+            "name":"l2 off",
+            "device": "d-b",
+            "type": "off",
+            "time": "18:30",
+            "duration": false
+          },
+          {
+            "id": "e",
+            "device": "d-c",
+            "name":"water1",
+            "type": "duration",
+            "time": "09:40",
+            "duration": 300
+          },
+          {
+            "id": "f",
+            "device": "d-c",
+            "name":"water2",
+            "type": "duration",
+            "time": "15:40",
+            "duration": 200
+          },
+          {
+            "id": "g",
+            "name":"water3",
+            "device": "d-c",
+            "type": "duration",
+            "time": "20:41",
+            "duration": "600"
+          },
+        ],
+        "devices": [
+          {
+           "id": "d-a",
+           "name": "lamp 1",
+           "port": 1,
+           "icon": "cog",
+           "color": "#ffeb3b"
+           },
+           {
+            "id": "d-b",
+            "name": "lamp 2",
+            "port": 2,
+            "icon": "cog",
+            "color": "#ffc107"
+          },
+          {
+            "id": "d-c",
+            "port": 3,
+            "name": "water",
+            "icon": "tint",
+            "color": "#2196f3"
+          }
+        ],
+      };
+    </script>
+  </body>
 </html>
 
