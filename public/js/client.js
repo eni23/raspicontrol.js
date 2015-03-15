@@ -76,9 +76,9 @@ var scheduler = {
     $(".popover-edit-type > div > label").click(this.edit_change_type);
     $(".popover-edit input").on("change", this.edit_change_form);
     
-    //$(".colorsel").on('click touch tap',function(){
-    //  scheduler.popover('#popover-color',$(this))
-    //});
+    $(".colorsel").on('click touch tap',function(){
+      scheduler.popover('#popover-color',$(this))
+    });
     
     // delete item button
     $("#edit-item-delbutton").click(this.delete_item);
@@ -420,7 +420,7 @@ var scheduler = {
 
     item.origData.type=type;
     item.className=type;
-    item.end=null;
+    //item.end=null;
     item.type='box';
 
     if (item.origData.type=='duration'){
@@ -428,16 +428,18 @@ var scheduler = {
       if (isNaN(duration_val) || !duration_val){
         duration_val=300;
       }
-      var end=moment(item.start).add( parseInt(duration_val) , 'seconds').format('HH:mm');
-      item.end=end;
+      var d_end=moment(item.start).add( parseInt(duration_val) , 'seconds');
+      item.end=d_end;
       item.type='range';
       item.origData.duration=duration_val;
       $("#edit-duration").val(duration_val);
     }
 
-    scheduler.visItems.update(item)
-    scheduler.update_group_background(item.group)
-
+    scheduler.visItems.update(item);
+    scheduler.update_group_background(item.group);
+    scheduler.timeline.setSelection(item.id);
+    scheduler.popover_recalc("#popover-edit", $(".item.selected > .content").parent() );
+    
     scheduler.api.save(item)
 
   },
@@ -578,15 +580,21 @@ var scheduler = {
       if (no_positioning==true) return elem;
     }
     elem.offset(newpos);
-    // store for faster moving
+    scheduler.popover_recalc(elem,target);
+    return elem;
+  },
+
+  // store for faster moving
+  popover_recalc: function(selector, target){
+    var elem=$(selector);
     scheduler._popovers[selector]=elem;
     scheduler._popovers[selector]._target=target;
     scheduler._popovers[selector]._width=elem.width();
     scheduler._popovers[selector]._height=elem.height();
     scheduler._popovers[selector]._targetwidth=target.width();
     scheduler._popovers[selector]._targetheight=target.height();
-    return elem;
   },
+
 
   popover_move: function(selector){
     var offset = scheduler._popovers[selector]._target.offset();

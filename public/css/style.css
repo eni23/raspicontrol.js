@@ -46,7 +46,7 @@ input.item-name {
 div.timetable-device {
   display: block;
   height: 85px;
-  width: 80px;
+  width: 85px;
 }
 
 div.timetable-device div.colorsel {
@@ -120,8 +120,6 @@ div.item.range.duration:before, .icon-action-duration:before{
   color: #000000 ! important;
 }
 
-
-
 .vis.timeline div.group div.background {
 	opacity: 0.3;
 	z-index: 0;
@@ -148,8 +146,19 @@ div.item.range.duration:before, .icon-action-duration:before{
   border-radius: 3px;
 }
 
-
-
 .edit-item-delarea {
   margin-top: 18px;
+}
+
+.popover-color {
+  width: 140px ! important;
+}
+
+h3.popover-title span {
+  margin-top: -3.5px;
+}
+
+/* mobile */
+#edit-item-addbuton, #edit-item-delbutton {
+  min-width: 133px;
 }
