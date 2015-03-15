@@ -67,16 +67,26 @@ var timer = {
     rainbow = new rainbow_maker();
     rainbow.num = 110; // number of items
     for (i=0;i<rainbow.num;i++){
+        // remove last 18% those are repeated colors
+        if (i > ( rainbow.num-((rainbow.num/100 ) * 5)) ) {
+          console.log(i,'last');
+          continue;
+        }
+        console.log('reg',i)
         var color=rainbow.next();
-        $('.popover-color ul.color-sel').append('<li>'+color+'</li>').children(':last').css('background-color',color);
+        $('.popover-color ul.color-sel')
+         .append('<li>'+color+'</li>')
+         .children(':last')
+         .css('background-color',color)
+         .css('color',modcolor(color,70));
     }
 
     // init scroll-area
     $('.popover-color ul.color-sel').slimScroll({ 
       height: 'auto',
       size: 5,
-      wheelStep: +1,
-      touchScrollStep: +1,
+      wheelStep: 1,
+      touchScrollStep: 0,
       allowPageScroll: false
     });
 

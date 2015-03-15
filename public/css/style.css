@@ -215,8 +215,9 @@ h3.popover-title span {
   border-radius: 5px;
   color: transparent;
   text-align: center;
-  line-height: 2;
+  line-height: 2.5;
   cursor: pointer;
+  font-size: 10px
 }
 
 .popover-color ul.color-sel > .active {
