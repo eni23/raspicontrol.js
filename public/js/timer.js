@@ -47,18 +47,68 @@ var timer = {
     //popover:edit change input value
     $(".popover-edit input").on("change", this.edit_change_form);
 
-    // device click on small round color-button
-    $(".colorsel").on('click touch tap',function(){
-      timer.popover('#popover-color',$(this))
-    });
-
     // popover:edit delete item button
     $("#edit-item-delbutton").click(this.delete_item);
 
     // popover:new add new item button
     $("#edit-item-addbuton").click(this.add_new_item);
 
+    // color sel TODO: move to own file
+    this.colorselector_init();
+
   },
+
+
+
+  // color sel TODO: move to own file
+  colorselector_init: function(){
+    
+    //make colors
+    rainbow = new rainbow_maker();
+    rainbow.num = 110; // number of items
+    for (i=0;i<rainbow.num;i++){
+        var color=rainbow.next();
+        $('.popover-color ul.color-sel').append('<li>'+color+'</li>').children(':last').css('background-color',color);
+    }
+
+    // init scroll-area
+    $('.popover-color ul.color-sel').slimScroll({ 
+      height: 120,
+      size: 0,
+      wheelStep: 4,
+      allowPageScroll: true
+    });
+
+    // device click on small round color-button
+    $(".colorsel").on('click',function(evt){
+      var lastcolor = $(this).css('background-color');
+      var color = rgb2hex(lastcolor).toUpperCase()
+      var active = $('.popover-color ul.color-sel > li:contains('+color+')');    
+      timer.colorsel_elem=this;
+      timer.popover('#popover-color',$(this))
+      if (active.length==0) return
+      $('.popover-color ul.color-sel > li').removeClass('active');
+      active.addClass('active');
+      $('.popover-color ul.color-sel').slimScroll({ scrollTo: active.get(0).offsetTop });
+      return;
+    });
+
+    // user selects color
+    $(".popover-color ul.color-sel > li").click(function(){
+      var color=$(this).html();
+      var group=timer.colorsel_elem.className.split(' ')[1].split('_')[1];
+      var darker=modcolor(color,-25);
+      $('.vis.timeline .group_'+group+' .item, .bg-group_'+group).css('background-color',color);
+      $('.vis.timeline .group_'+group+' .item.selected').css('background-color',darker);
+      timer.popover_hide('#popover-color');
+      console.log(color)
+      // save
+    });
+
+  },
+
+  colorsel_elem: false,
+
 
 
   /**
@@ -100,15 +150,15 @@ var timer = {
     },
     save: function(item){
       var rate=50;
-      console.log('api-save');
+      //console.log('api-save');
     },
     add: function(item){
       var rate=0;
-      console.log('api-add');
+      //console.log('api-add');
     },
     delete: function(item){
       var rate=0;
-      console.log('api-remove');
+      //console.log('api-remove');
     },
   },
 
@@ -387,10 +437,16 @@ var timer = {
 
     }
 
-    // loop over background-array and set end if missing
+    // loop over background-array 
     for (k in background){
+      // fix missing end
       if (!background[k].end){
         background[k].end=timer.today_end;
+      }
+      // update delete-array, only delete unused backgrounds
+      var index = delitems.indexOf( background[k].id );
+      if ( index > -1 ){
+        delitems.splice(index,1);
       }
     }
 

@@ -72,6 +72,7 @@ div.timetable-device div.devicename {
   font-size: 16px;
   font-weight: bold;
   text-align: center;
+  margin-top: -5px;
 }
 
 div.item.box.on, div.item.box.off, div.item.box.toggle {
@@ -150,9 +151,6 @@ div.item.range.duration:before, .icon-action-duration:before{
   margin-top: 18px;
 }
 
-.popover-color {
-  width: 140px ! important;
-}
 
 h3.popover-title span {
   margin-top: -3.5px;
@@ -162,3 +160,56 @@ h3.popover-title span {
 #edit-item-addbuton, #edit-item-delbutton {
   min-width: 133px;
 }
+
+
+
+
+
+
+/** color selector **/
+.popover-color {
+  width: 140px ! important;
+  height: 165px ! important;
+  left: +12px ! important;
+}
+.popover-color .popover-content {
+  padding: 0;
+  margin: 0;
+}
+
+
+.popover-color div.color-sel {
+  width: 100%;
+  height:120px ! important;
+  overflow: hidden;
+  margin-top:5px;
+}
+
+.popover-color ul.color-sel {
+  list-style-type: none;
+  list-style-position:inside;
+  padding: 0;
+  margin: 0;
+}
+
+.popover-color ul.color-sel > li {
+  display: block;
+  width: calc( 100% - 20px );
+  height:25px;
+  margin: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
+  border:1px solid;
+  border-color: #ccc;
+  box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+  border-radius: 5px;
+  color: transparent;
+  text-align: center;
+  line-height: 2;
+  cursor: pointer;
+}
+
+.popover-color ul.color-sel > .active {
+  border: 1px solid #333;
+}
+
