@@ -74,7 +74,7 @@ var scheduler = {
 
     // edit popover change type
     $(".popover-edit-type > div > label").click(this.edit_change_type);
-    $(".popover-edit input").on("input", this.edit_change_form);
+    $(".popover-edit input").on("change", this.edit_change_form);
     
     //$(".colorsel").on('click touch tap',function(){
     //  scheduler.popover('#popover-color',$(this))
@@ -177,27 +177,33 @@ var scheduler = {
     return items;
   },
 
-  // gets called when user zooms and moves timeline
-  drag_timeline_timeout: false,
-  drag_timeline: function(evt){
+  // move popover 
+  // gets called when user zooms and moves timeline, moving item
+  // simple rate-limiting
+  move_open_popover_timeout: false,
+  move_open_popover: function(){
     var rate=20;
-    if (scheduler.drag_timeline_timeout==false){
-      scheduler.drag_timeline_timeout=setTimeout(scheduler.drag_timeline_cb,rate);
-      if ( $("#popover-edit").is(":visible") && scheduler.edit_new_item==false ) {
-        var open_elem=$(".item.selected > .content").parent();
-        scheduler.popover("#popover-edit",open_elem);
-      }
+    if (scheduler.move_open_popover_timeout==false){
+      scheduler.move_open_popover_timeout=setTimeout(scheduler.move_open_popover_cb,rate);
+      scheduler.move_open_popover_action()
     }
     return true;
   },
   // gets called by drag-timeline-timeout to reset rate limiting to zero
-  drag_timeline_cb: function(){
-    console.log('clear')
-    clearTimeout(scheduler.drag_timeline_timeout);
-    scheduler.drag_timeline_timeout=false;
+  move_open_popover_cb: function(){
+    clearTimeout(scheduler.move_open_popover_timeout);
+    scheduler.move_open_popover_timeout=false;
+  },
+  // the real moving
+  move_open_popover_action: function(){
+    if ( $("#popover-edit").is(":visible") && scheduler.edit_new_item==false ) {
+      scheduler.popover_move("#popover-edit");
+    }
+    return true;
   },
 
-
+  // gets called if user zooms and drags timeline
+  drag_timeline: function(){ scheduler.move_open_popover(); },
 
   // gets called when a user drags an item around
   drag_item: function(item){
@@ -211,17 +217,15 @@ var scheduler = {
     scheduler.update_group_background(item.group)
 
     // if edit-tooltip is open, update time and move tooltip too
-    // TODO: only move popover not create again
     if ( $("#popover-edit").is(":visible") ) {
-      var moving_elem=$(".item.selected > .content").parent();
       var newtime=moment(item.start).format('HH:mm');
-      scheduler.popover("#popover-edit",moving_elem);
       $("#edit-start").val(newtime);
       $("#popover-edit").data(item)
       // is duration
       if ( item.origData.type=='duration'){
         $("#edit-duration").val(dur_calc);
       }
+      scheduler.popover_move("#popover-edit");
     }
 
     //scheduler.api.save(item);
@@ -248,7 +252,6 @@ var scheduler = {
 
     var is_on=false;
     for (k in sorted){
-
 
       var item=sorted[k];
       var last=background[background.length-1];
@@ -407,23 +410,37 @@ var scheduler = {
   },
 
   // gets called if user changes values in edit-popover input fields
+  edit_change_count:0,
   edit_change_form: function(evt){
-
-    console.log('updateforn')
+    // only on edit
     if (scheduler.edit_new_item) return true;
-    var item=$("#popover-edit").data();
-    
-    if ( $(this).hasClass('item-form-duration') ){
-      var end=moment(item.start).add( parseInt($(this).val()) , 'seconds').format('HH:mm');
-      item.end=today+" "+end;
+    // discard first 2 events 
+    scheduler.edit_change_count++;
+    if (scheduler.edit_change_count<3) return;
 
+    var formid=evt.delegateTarget.id;
+    var item=$("#popover-edit").data();
+
+    if (formid=="edit-duration"){
+      var end = moment(item.start).add( parseInt($(this).val()) , 'seconds').format('HH:mm');
+      item.end = today + " " + end;
       item.origData.duration = $("#edit-duration").val();
-      //scheduler.visItems.update(item);
       scheduler.drag_item(item);
+      return true;
     }
 
-    //scheduler.api.save(item)
+    else if (formid=="edit-start"){
+      var dat=moment(today+" "+$("#edit-start").val());
+      item.origData.time = dat.format('HH:mm');
+      item.start=dat;
+      // only save and update bg, no move
+      scheduler.visItems.update(item);
+      scheduler.update_group_background(item.group);
+      return true;
+    }
+    return true;
   },
+
 
   // delete item
   // gets called if user clicks delete button on edit popover
@@ -444,17 +461,14 @@ var scheduler = {
     
     var start=moment(evt.start).format('HH:mm');
 
-    // prepare popover
     scheduler.edit_new_item=true;
     $("#edit-popover-title").html('New Item');
     $(".edit-item-delarea").hide();
     $(".edit-item-addarea").show();
     scheduler.popover("#popover-edit");
-
     $("#edit-type-on").trigger('click');
     $("#edit-duration").val('300');
     $("#edit-start").val(start)
-
     $("#popover-edit").data(evt);
 
   },
@@ -507,7 +521,7 @@ var scheduler = {
   },
 
 
-
+  _popovers: [],
   popover: function(selector, target, placement, no_positioning){
     var elem=$(selector);
     if (typeof target == 'undefined') {
@@ -534,10 +548,28 @@ var scheduler = {
       if (no_positioning==true) return elem;
     }
     elem.offset(newpos);
+    // store for faster moving
+    scheduler._popovers[selector]=elem;
+    scheduler._popovers[selector]._target=target;
+    scheduler._popovers[selector]._width=elem.width();
+    scheduler._popovers[selector]._height=elem.height();
+    scheduler._popovers[selector]._targetwidth=target.width();
+    scheduler._popovers[selector]._targetheight=target.height();
     return elem;
   },
 
+  popover_move: function(selector){
+    var offset = scheduler._popovers[selector]._target.offset();
+    var newpos={
+      top: offset.top + (scheduler._popovers[selector]._targetheight * 2),
+      left: offset.left - ( scheduler._popovers[selector]._width / 2) + ( scheduler._popovers[selector]._targetwidth * 0.75 ) 
+    }
+    scheduler._popovers[selector].offset(newpos);
+    return;
+  },
+
   popover_hide: function(selector){
+    scheduler._popovers[selector]=false;
     return $(selector).popoverX('hide');
   },
 
