@@ -1,50 +1,3 @@
-// TODO: move to own file
-// darken or lighten a color  amt- for darken and amt+ for lighten
-var modcolor = function (col, amt) {
-  var usePound = false;
-  if (col[0] == "#") {
-    col = col.slice(1);
-    usePound = true;
-  }
-  var num = parseInt(col, 16);
-  var r = (num >> 16) + amt;
-  if (r > 255) {
-    r = 255;
-  } else if (r < 0) {
-    r = 0;
-  }
-  var b = ((num >> 8) & 0x00FF) + amt;
-  if (b > 255) {
-    b = 255;
-  } else if (b < 0) {
-    b = 0;
-  }
-  var g = (num & 0x0000FF) + amt;
-  if (g > 255) {
-    g = 255;
-  } else if (g < 0) {
-    g = 0;
-  }
-  return (usePound?"#":"") + String("000000" + (g | (b << 8) | (r << 16)).toString(16)).slice(-6);
-}
-
-// TODO: replace with moment.js
-Date.prototype.yyyymmdd = function () {
-    var yyyy = this.getFullYear().toString();
-    var mm = (this.getMonth() + 1).toString();
-    var dd = this.getDate().toString();
-    return yyyy + '-' + (mm[1] ? mm : '0' + mm[0]) + '-' + (dd[1] ? dd : '0' + dd[0]);
-};
-var d = new Date();
-var today = d.yyyymmdd();
-var todayStart = new Date();
-todayStart.setHours(0, 0, 0, 0);
-var todayEnd = new Date();
-todayEnd.setHours(24, 0, 0, 0);
-
-
-
-
 /**
  * raspicontrol.js
  * https://github.com/eni23/raspicontrol.js
@@ -56,21 +9,17 @@ todayEnd.setHours(24, 0, 0, 0);
  * @date    2015-03-15
  *
  * @license
- * Copyright (C) 2011-2014 Almende B.V, http://almende.com
- *
- * WHATEVER, MAN - license
+ * WHATEVER, MAN 
  *
  */
-
+ 
 var timer = {
 
 
-  // placeholders
-  editid: false,
-  timeline: false,
+  // placeholder for visDatasets
   groups: [],
   timers: [],
-  lastid: 8,
+
 
   /**
    * main entry point gets called after document.ready is triggered
@@ -107,6 +56,7 @@ var timer = {
     $("#edit-item-addbuton").click(this.add_new_item);
 
   },
+
 
   // api
   // TODO: move to own file
@@ -173,14 +123,17 @@ var timer = {
     this.timeline.on('select',this.edit_item);
     this.timeline.on('rangechange',this.drag_timeline);
   },
+  
+  // placeholder for timeline-object
+  timeline: false,
 
 
   /**
-   * main entry point gets called after document.ready is triggered
+   * render data from api
    *
+   * @param  {object} data      data to render: { devices: [..] , timers: [...] } 
    * @returns none
    */
-  // render data from api
   render: function(data){
 
     var timers=[];
@@ -252,6 +205,7 @@ var timer = {
   /**
    * function for sorting timers by time
    *
+   * @type filter-function
    * @param {*} a             date a
    * @param {*} b             date b
    * @returns {int}           bigger or smaller
@@ -278,51 +232,9 @@ var timer = {
 
 
   /**
-   * main entry point gets called after document.ready is triggered
-   * rate=action triggered only every n millisecounds
-   *
-   * @returns {boolean}       allways true
-   */
-  move_open_popover: function(){
-    var rate=20;
-    if (timer.move_open_popover_timeout==false){
-      timer.move_open_popover_timeout=setTimeout(timer.move_open_popover_cb,rate);
-      timer.move_open_popover_action()
-    }
-    return true;
-  },
-
-  // placeholder fot popover-move-ratelimit-timeout
-  move_open_popover_timeout: false,
-
-
-  /**
-   * popover-move-ratelimit: clear limit
-   *
-   * @returns none
-   */
-  move_open_popover_cb: function(){
-    clearTimeout(timer.move_open_popover_timeout);
-    timer.move_open_popover_timeout=false;
-  },
-
-
-  /**
-   * popover-move-ratelimit: move popup
-   *
-   * @returns {boolean}       allways true
-   */ 
-  move_open_popover_action: function(){
-    if ( $("#popover-edit").is(":visible") && timer.edit_new_item==false ) {
-      timer.popover_move("#popover-edit");
-    }
-    return true;
-  },
-
-
-  /**
    * gets called if user zooms and drags timeline
    *
+   * @type event-callback
    * @returns none
    */
   drag_timeline: function(){ timer.move_open_popover(); },
@@ -331,7 +243,8 @@ var timer = {
   /**
    * gets called when a user drags an item around
    *
-   * @param {visItem} item    visDataset-item
+   * @type event-callback
+   * @param {visItem} item    visDataset-item which is currently moving
    * @returns {boolean}       allways true
    */ 
   drag_item: function(item){
@@ -376,8 +289,8 @@ var timer = {
   /**
    * update background of specific group
    *
-   * @param {string} group   the name of the group/deivce
-   * @returns {boolean}      allways true
+   * @param {string} group      the name of the group/deivce
+   * @returns {boolean}         allways true
    */
   // 
   update_group_background: function(group){
@@ -453,9 +366,11 @@ var timer = {
 
 
   /**
-   * open edit popover
+   * edit item open popover
    * gets called if click/tap twice on existing item
    *
+   * @type event-callback
+   * @param {visItem} evt       visItem object of selected item
    * @returns none
    */
   edit_item: function(evt){
@@ -509,10 +424,15 @@ var timer = {
 
   },
 
+  // placeholder for edititem
+  editid: false,
+
 
   /**
+   * edit item: change type
    * gets called when user changes type in edit popover
    *
+   * @type event-callback
    * @returns {boolean}      allways true
    */
   edit_change_type: function(evt){
@@ -560,8 +480,10 @@ var timer = {
 
 
   /**
-   * gets called if user changes values in edit-popover input fields
+   * edit item: change form value
+   * gets called for every formupdate
    *
+   * @type event-callback
    * @returns {boolean}      allways true
    */
   edit_change_form: function(evt){
@@ -605,6 +527,7 @@ var timer = {
    * delete item
    * gets called if user clicks delete button on edit popover
    * 
+   * @type event-callback
    * @returns none
    */
   delete_item: function(){
@@ -618,9 +541,11 @@ var timer = {
 
 
   /**
-   * gets called if user tries to add new entry
+   * open new item popover
+   * gets called if user doublecklicks in timeline (no item selected)
    *
-   * @returns none
+   * @type event-callback
+   * @returns {boolean}       allways false
    */
   new_item: function(evt){
     var start=moment(evt.start).format('HH:mm');
@@ -633,7 +558,7 @@ var timer = {
     $("#edit-duration").val('300');
     $("#edit-start").val(start)
     $("#popover-edit").data(evt);
-
+    return false;
   },
   
   // flag for popover
@@ -641,8 +566,10 @@ var timer = {
   
 
   /**
+   * create new item
    * gets called if user clicks 'add new item' in new item dialog
    *
+   * @type event-callback
    * @returns none;
    */
   add_new_item: function(){
@@ -654,7 +581,7 @@ var timer = {
     
     // TODO: get id from api
     var origData={
-      "id": timer.lastid,
+      "id": '_new-item-'+timer.lastid,
       "device": item.group,
       "type": type,
       "time": $("#edit-start").val(),
@@ -663,7 +590,7 @@ var timer = {
 
     var visItem={
       content:'',
-      id: timer.lastid,
+      id: '_new-item-'+ timer.lastid,
       start: today + ' ' + $("#edit-start").val(),
       group: item.group,
       className: type,
@@ -672,31 +599,36 @@ var timer = {
     }
 
     if (type=='duration'){
-     var end=moment(today+' '+origData.time).add( parseInt($("#edit-duration").val()) , 'seconds').format('HH:mm');
-     visItem.end=today+' '+end;
-     visItem.type='range';
-     origData.duration=parseInt($("#edit-duration").val());
-   }
+      var end=moment(today+' '+origData.time).add( parseInt($("#edit-duration").val()) , 'seconds').format('HH:mm');
+      visItem.end=today+' '+end;
+      visItem.type='range';
+      origData.duration=parseInt($("#edit-duration").val());
+    }
 
-   timer.lastid++;
+    timer.lastid++;
 
-   timer.timers.add(visItem);
-   timer.update_group_background(visItem.group);
-   timer.popover_hide("#popover-edit");
-   timer.timeline.setSelection(visItem.id);
+    timer.timers.add(visItem);
+    timer.update_group_background(visItem.group);
+    timer.popover_hide("#popover-edit");
+    timer.timeline.setSelection(visItem.id);
 
-   timer.api.add(visItem);
+    timer.api.add(visItem);
 
-   timer.edit_new_item=false;
-   $("#popover-edit").data(false);
+    timer.edit_new_item=false;
+    $("#popover-edit").data(false);
 
- },
+  },
+
+  // new item: counter for temporary new id 
+  lastid:0,
+
 
 
   /**
-   * main entry point gets called after document.ready is triggered
+   * create new popover
+   * TODO: move to own file
    *
-   * @param {string}  selector        jQuery-Selector
+   * @param {string}  selector        jQuery-Selector with popover-content
    * @param {object}  target          jQuery/DOM-element to bind popover
    * @param {string}  placement       top, bottom, bottom-left etc,,
    * @param {boolean} no_positioning  do not positioning popover
@@ -783,8 +715,55 @@ var timer = {
 
 
   /**
+   * popover-move-ratelimit 
+   * speed-optimised, can be called when popup is closed whith time impact
+   * rate=action triggered only every n millisecounds
+   *
+   * @returns {boolean}       allways true
+   */
+  move_open_popover: function(){
+    var rate=20;
+    if (timer.move_open_popover_timeout==false){
+      timer.move_open_popover_timeout=setTimeout(timer.move_open_popover_cb,rate);
+      timer.move_open_popover_action()
+    }
+    return true;
+  },
+
+  // placeholder fot popover-move-ratelimit-timeout
+  move_open_popover_timeout: false,
+
+
+  /**
+   * popover-move-ratelimit: clear limit
+   *
+   * @type timeout-function
+   * @returns none
+   */
+  move_open_popover_cb: function(){
+    clearTimeout(timer.move_open_popover_timeout);
+    timer.move_open_popover_timeout=false;
+  },
+
+
+  /**
+   * popover-move-ratelimit: really move popup
+   *
+   * @returns {boolean}       allways true
+   */ 
+  move_open_popover_action: function(){
+    if ( $("#popover-edit").is(":visible") && timer.edit_new_item==false ) {
+      timer.popover_move("#popover-edit");
+    }
+    return true;
+  },
+
+
+
+  /**
    * store touch/cklick-position, gets triggered on every elem on document
    *
+   * @type event-callback
    * @param {Event} event   the triggered event
    * @returns none
    */
@@ -814,5 +793,53 @@ var timer = {
  * start timer app after document is ready
  **/
 $(document).ready(function () {
+
     timer.init();
 });
+// EOF
+
+
+
+// TODO: move to own file
+// darken or lighten a color  amt- for darken and amt+ for lighten
+var modcolor = function (col, amt) {
+  var usePound = false;
+  if (col[0] == "#") {
+    col = col.slice(1);
+    usePound = true;
+  }
+  var num = parseInt(col, 16);
+  var r = (num >> 16) + amt;
+  if (r > 255) {
+    r = 255;
+  } else if (r < 0) {
+    r = 0;
+  }
+  var b = ((num >> 8) & 0x00FF) + amt;
+  if (b > 255) {
+    b = 255;
+  } else if (b < 0) {
+    b = 0;
+  }
+  var g = (num & 0x0000FF) + amt;
+  if (g > 255) {
+    g = 255;
+  } else if (g < 0) {
+    g = 0;
+  }
+  return (usePound?"#":"") + String("000000" + (g | (b << 8) | (r << 16)).toString(16)).slice(-6);
+}
+
+// TODO: replace with moment.js
+Date.prototype.yyyymmdd = function () {
+    var yyyy = this.getFullYear().toString();
+    var mm = (this.getMonth() + 1).toString();
+    var dd = this.getDate().toString();
+    return yyyy + '-' + (mm[1] ? mm : '0' + mm[0]) + '-' + (dd[1] ? dd : '0' + dd[0]);
+};
+var d = new Date();
+var today = d.yyyymmdd();
+var todayStart = new Date();
+todayStart.setHours(0, 0, 0, 0);
+var todayEnd = new Date();
+todayEnd.setHours(24, 0, 0, 0);
