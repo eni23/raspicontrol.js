@@ -78,9 +78,12 @@ var timer = {
   today_end: false,
 
 
-  // api
-  // TODO: move to own file
-  api: {
+  /**
+   * API-Wrapper
+   * high level functions for timer-based updates
+   *
+   */
+   api: {
     queue:[],
     call_timeout:false,
     clear_rate_callback: function(){
@@ -133,15 +136,23 @@ var timer = {
           day: ' '
         }
       },
+      // callback for adding new item
       onAdd: timer.new_item,
+      // callback for re-calculate background
       onMoving: timer.drag_item
     };
+
+    // init visJs-timeline
     this.timeline = new vis.Timeline(container);
     this.timeline.setOptions(options);
     this.timeline.setGroups(this.groups);
     this.timeline.setItems(this.timers);
+
+    // calback for opening edit-popover after twice klick/tap item
     this.timeline.on('select',this.edit_item);
+    // callback for moving open edit-popover on drag/zoom
     this.timeline.on('rangechange',this.drag_timeline);
+
   },
   
   // placeholder for timeline-object
@@ -321,6 +332,8 @@ var timer = {
     var delitems=[];
     var groupstr='group_'+group;
 
+    // simulate timer: 
+    // loop over all group items sorted by time and create bg-array
     var is_on=false;
     for (k in sorted){
 
@@ -331,20 +344,21 @@ var timer = {
         type: 'background',
         group: group
       };
-
+      // if item is background, add to delete candidates and skip this item
       if (item.type=='background'){
         delitems.push(item.id);
         continue;
       }
 
       if (item.origData.type=='on'){
+        // if 'device' is allready on, skip the item
         if (is_on) continue;
         is_on=true;
         bgtemplate.start=item.start;
         background.push(bgtemplate);
       }
-
       else if (item.origData.type=='off'){
+        // if 'device' is not turned skip the item 
         if (!is_on) continue;
         if (last.end) continue;
         is_on=false;
@@ -352,26 +366,28 @@ var timer = {
       }
 
       else if (item.origData.type=='toggle'){
+        // if 'device' is on, turn off  
         if (is_on){
           last.end=item.start;
           is_on=false;
         }
+        //else turn device on
         else {
           is_on=true;
           bgtemplate.start=item.start;
           background.push(bgtemplate);
         }
       }
-
       else if (item.origData.type=='duration'){
         //is_on=true;
         bgtemplate.start=item.start;
         bgtemplate.end=item.end;
         background.push(bgtemplate);
       }
+
     }
 
-    // fill up ends
+    // loop over background-array and set end if missing
     for (k in background){
       if (!background[k].end){
         background[k].end=timer.today_end;
@@ -380,7 +396,6 @@ var timer = {
 
     this.timers.remove(delitems);
     this.timers.update(background);
-
     return true;
   },
 
@@ -805,7 +820,8 @@ var timer = {
   // placeholder for click-position
   clickpos: {},
 
-};
+
+}; 
 
 
 /**
