@@ -12,14 +12,13 @@
  * WHATEVER, MAN 
  *
  */
- 
+
 var timer = {
 
 
   // placeholder for visDatasets
   groups: [],
   timers: [],
-
 
   /**
    * main entry point gets called after document.ready is triggered
@@ -28,13 +27,16 @@ var timer = {
    */
   init: function(){
     
+    // set date to today
+    this.set_date_today();
+
     // init timeline & fetch data
     this.render(demodata);
     this.init_timeline();
     this.update_background();
 
-    // set event hanlers
 
+    // set event hanlers
     // store click/touch-position for popover:new 
     $(document).on('click tap',this.update_clickpos);
 
@@ -56,6 +58,23 @@ var timer = {
     $("#edit-item-addbuton").click(this.add_new_item);
 
   },
+
+
+  /**
+   * set date today
+   *
+   * @returns none
+   */
+  set_date_today: function(){
+    this.today = moment().startOf('day').format("YYYY-MM-DD");
+    this.today_start = moment().startOf('day').format("YYYY-MM-DD HH:mm:ss");
+    this.today_end = moment().endOf('day').format("YYYY-MM-DD HH:mm:ss");
+  },
+
+  // placeholders for date today yyyy-mm-dd (hh:mm:ss)
+  today: false,
+  today_start: false,
+  today_end: false,
 
 
   // api
@@ -98,8 +117,8 @@ var timer = {
   init_timeline: function(){
     var container = document.getElementById('visualization');
     var options = {
-      min: todayStart,
-      max: todayEnd,
+      min: timer.today_start,
+      max: timer.today_end,
       orientation: top,
       editable: {
         add: true,
@@ -181,15 +200,15 @@ var timer = {
       var visItem={
         id:item.id,
         content:'',
-        start: today + ' ' + item.time,
+        start: timer.today + ' ' + item.time,
         group: item.device,
         className: item.type,
         type: 'box',
         origData:item
       }
       if (item.type=='duration'){
-       var end=moment(today+' '+item.time).add( parseInt(item.duration) , 'seconds').format('HH:mm');
-       visItem.end=today+' '+end;
+       var end=moment(timer.today+' '+item.time).add( parseInt(item.duration) , 'seconds').format('HH:mm');
+       visItem.end=timer.today+' '+end;
        visItem.type='range';
        visItem.className=item.type+' bg-group_'+item.device;
      }
@@ -354,7 +373,7 @@ var timer = {
     // fill up ends
     for (k in background){
       if (!background[k].end){
-        background[k].end=today+" "+"24:00";
+        background[k].end=timer.today_end;
       }
     }
 
@@ -498,14 +517,14 @@ var timer = {
 
     if (formid=="edit-duration"){
       var end = moment(item.start).add( parseInt($(this).val()) , 'seconds').format('HH:mm');
-      item.end = today + " " + end;
+      item.end = timer.today + " " + end;
       item.origData.duration = $("#edit-duration").val();
       timer.drag_item(item);
       return true;
     }
 
     else if (formid=="edit-start"){
-      var dat=moment(today+" "+$("#edit-start").val());
+      var dat=moment(timer.today+" "+$("#edit-start").val());
       item.origData.time = dat.format('HH:mm');
       item.start=dat;
       // only save and update bg, no move, uncomment for move
@@ -591,7 +610,7 @@ var timer = {
     var visItem={
       content:'',
       id: '_new-item-'+ timer.lastid,
-      start: today + ' ' + $("#edit-start").val(),
+      start: timer.today + ' ' + $("#edit-start").val(),
       group: item.group,
       className: type,
       type: 'box',
@@ -599,8 +618,8 @@ var timer = {
     }
 
     if (type=='duration'){
-      var end=moment(today+' '+origData.time).add( parseInt($("#edit-duration").val()) , 'seconds').format('HH:mm');
-      visItem.end=today+' '+end;
+      var end=moment(timer.today+' '+origData.time).add( parseInt($("#edit-duration").val()) , 'seconds').format('HH:mm');
+      visItem.end=timer.today+' '+end;
       visItem.type='range';
       origData.duration=parseInt($("#edit-duration").val());
     }
@@ -767,7 +786,6 @@ var timer = {
    * @param {Event} event   the triggered event
    * @returns none
    */
-  // 
   update_clickpos: function(evt){
     // is click
     if (evt.pageX && evt.pageX){
@@ -791,17 +809,24 @@ var timer = {
 
 /**
  * start timer app after document is ready
+ * TODO: move to requirejs main app file
  **/
 $(document).ready(function () {
-
     timer.init();
 });
 // EOF
 
 
 
+
 // TODO: move to own file
-// darken or lighten a color  amt- for darken and amt+ for lighten
+/**
+ * darken or lighten a color
+ *
+ * @param {sting} color     color in format #ff0011
+ * @param {int}   amt       amout to darken / lighten, positive for lighten, negative for darken, range -100 to + 100
+ * @returns {string}        modified color in format #aa0011
+ */
 var modcolor = function (col, amt) {
   var usePound = false;
   if (col[0] == "#") {
@@ -829,17 +854,3 @@ var modcolor = function (col, amt) {
   }
   return (usePound?"#":"") + String("000000" + (g | (b << 8) | (r << 16)).toString(16)).slice(-6);
 }
-
-// TODO: replace with moment.js
-Date.prototype.yyyymmdd = function () {
-    var yyyy = this.getFullYear().toString();
-    var mm = (this.getMonth() + 1).toString();
-    var dd = this.getDate().toString();
-    return yyyy + '-' + (mm[1] ? mm : '0' + mm[0]) + '-' + (dd[1] ? dd : '0' + dd[0]);
-};
-var d = new Date();
-var today = d.yyyymmdd();
-var todayStart = new Date();
-todayStart.setHours(0, 0, 0, 0);
-var todayEnd = new Date();
-todayEnd.setHours(24, 0, 0, 0);
