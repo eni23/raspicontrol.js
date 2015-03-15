@@ -15,14 +15,15 @@
 
 var timer = {
 
-
   // placeholder for visDatasets
   groups: [],
   timers: [],
 
   /**
-   * main entry point gets called after document.ready is triggered
+   * init()
+   * main entry point
    *
+   * @type: main-func
    * @returns none
    */
   init: function(){
@@ -642,10 +643,9 @@ var timer = {
   lastid:0,
 
 
-
   /**
    * create new popover
-   * TODO: move to own file
+   * TODO: move to utils.js
    *
    * @param {string}  selector        jQuery-Selector with popover-content
    * @param {object}  target          jQuery/DOM-element to bind popover
@@ -781,6 +781,7 @@ var timer = {
 
   /**
    * store touch/cklick-position, gets triggered on every elem on document
+   * ? TODO: move to utils.js
    *
    * @type event-callback
    * @param {Event} event   the triggered event
