@@ -89,6 +89,35 @@ var scheduler = {
 
   },
 
+  // api
+  // TODO: move to own file
+  api: {
+
+    queue:[],
+    call_timeout:false,
+
+    clear_rate_callback: function(){
+
+    },
+
+
+
+    save: function(item){
+      var rate=50;
+      console.log('api-save');
+    },
+
+    add: function(item){
+      var rate=0;
+      console.log('api-add');
+    },
+    delete: function(item){
+      var rate=0;
+      console.log('api-remove');
+    },
+  },
+
+
   // init visjs timeline
   init_timeline: function(){
     this.visGroups = new vis.DataSet(this.devices);
@@ -228,7 +257,7 @@ var scheduler = {
       scheduler.popover_move("#popover-edit");
     }
 
-    //scheduler.api.save(item);
+    scheduler.api.save(item);
     return true;
   },
 
@@ -405,7 +434,7 @@ var scheduler = {
     scheduler.visItems.update(item)
     scheduler.update_group_background(item.group)
 
-    //scheduler.api.save(item)
+    scheduler.api.save(item)
 
   },
 
@@ -436,11 +465,11 @@ var scheduler = {
       // only save and update bg, no move
       scheduler.visItems.update(item);
       scheduler.update_group_background(item.group);
+      scheduler.api.save(item);
       return true;
     }
     return true;
   },
-
 
   // delete item
   // gets called if user clicks delete button on edit popover
@@ -450,17 +479,13 @@ var scheduler = {
     $("#popover-edit").data(false);
     scheduler.popover_hide("#popover-edit");
     scheduler.update_group_background(item.group);
-    //scheduler.api.delete(item)
+    scheduler.api.delete(item);
   },
-
-
 
   // gets called if user tries to add new entry
   edit_new_item: false,
   new_item: function(evt){
-    
     var start=moment(evt.start).format('HH:mm');
-
     scheduler.edit_new_item=true;
     $("#edit-popover-title").html('New Item');
     $(".edit-item-delarea").hide();
@@ -513,7 +538,8 @@ var scheduler = {
     scheduler.update_group_background(visItem.group);
     scheduler.popover_hide("#popover-edit");
     scheduler.timeline.setSelection(visItem.id);
-    //scheduler.api.save(visItem)
+    
+    scheduler.api.add(visItem);
 
     scheduler.edit_new_item=false;
     $("#popover-edit").data(false);
