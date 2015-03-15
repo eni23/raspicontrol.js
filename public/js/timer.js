@@ -86,7 +86,7 @@ var timer = {
       height: 'auto',
       size: 5,
       wheelStep: 1,
-      touchScrollStep: 0,
+      touchScrollStep: 1,
       allowPageScroll: false
     });
 
