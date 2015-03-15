@@ -73,10 +73,11 @@ var timer = {
 
     // init scroll-area
     $('.popover-color ul.color-sel').slimScroll({ 
-      height: 120,
-      size: 0,
-      wheelStep: 4,
-      allowPageScroll: true
+      height: 'auto',
+      size: 5,
+      wheelStep: +1,
+      touchScrollStep: +1,
+      allowPageScroll: false
     });
 
     // device click on small round color-button

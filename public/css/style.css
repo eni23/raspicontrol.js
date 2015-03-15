@@ -3,6 +3,16 @@ body {
   padding-bottom: 20px;
 }
 
+@media screen and (-webkit-min-device-pixel-ratio:0) { 
+  select:focus,
+  textarea:focus,
+  input:focus {
+    font-size: 16px;
+    background: #eee;
+  }
+}
+
+
 #visualization{
 	margin-top: 30px;
 }
