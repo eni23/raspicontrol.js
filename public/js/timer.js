@@ -80,7 +80,7 @@ var timer = {
     });
 
     // device click on small round color-button
-    $(".colorsel").on('click',function(evt){
+    $(".colorsel").on('click tap',function(evt){
       var lastcolor = $(this).css('background-color');
       var color = rgb2hex(lastcolor).toUpperCase()
       var active = $('.popover-color ul.color-sel > li:contains('+color+')');    
@@ -98,11 +98,18 @@ var timer = {
       var color=$(this).html();
       var group=timer.colorsel_elem.className.split(' ')[1].split('_')[1];
       var darker=modcolor(color,-25);
-      $('.vis.timeline .group_'+group+' .item, .bg-group_'+group).css('background-color',color);
-      $('.vis.timeline .group_'+group+' .item.selected').css('background-color',darker);
       timer.popover_hide('#popover-color');
-      console.log(color)
+      var style = '.vis.timeline .group_'+group+' .item, .bg-group_'+group+' {'
+                + '  background-color:'+color+'; '
+                + '} .vis.timeline .group_'+group+' .item.selected  { '
+                + '  background-color:'+darker+'; '
+                + '}'
+                ;
+      $("#_devices-generated-styles").append(style);
+      console.log(color);
       // save
+      //timer.api.device.color(group,color)
+
     });
 
   },

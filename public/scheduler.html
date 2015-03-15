@@ -115,9 +115,9 @@
           </div>
         </div>
         <!-- delete button, only visible when edit !-->
-        <div class="row row-popover edit-item-delarea" id="edit-item-delbutton">
+        <div class="row row-popover edit-item-delarea">
           <div class="col-md-12">
-            <button class="btn btn-sm btn-danger">
+            <button class="btn btn-sm btn-danger" id="edit-item-delbutton">
               <span class="glyphicon mdi-action-delete" title="delete this item"></span> Delete this Item
             </button>
           </div>
@@ -221,6 +221,15 @@
             "time": "20:41",
             "duration": "600"
           },
+          {
+            "id": "x",
+            "name":"water3",
+            "device": "d-d",
+            "type": "duration",
+            "time": "10:41",
+            "duration": "3600"
+          },
+
         ],
         "devices": [
           {
@@ -243,6 +252,13 @@
             "name": "Water",
             "icon": "tint",
             "color": "#0D80DF"
+          },
+          {
+            "id": "d-d",
+            "port": 4,
+            "name": "Spray",
+            "icon": "leaf",
+            "color": "#30B8B1"
           }
         ],
       };

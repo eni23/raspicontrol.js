@@ -147,9 +147,7 @@ div.item.range.duration:before, .icon-action-duration:before{
   border-radius: 3px;
 }
 
-.edit-item-delarea {
-  margin-top: 18px;
-}
+
 
 
 h3.popover-title span {
@@ -161,7 +159,9 @@ h3.popover-title span {
   min-width: 133px;
 }
 
-
+.edit-item-delarea, .edit-item-addarea {
+  margin-top: 18px;
+}
 
 
 
