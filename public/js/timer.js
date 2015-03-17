@@ -64,14 +64,14 @@ var timer = {
   colorselector_init: function(){
     
     //make colors
-    rainbow = new rainbow_maker(110);
+    rainbow = new color_utils.rainbow_maker(110);
     for (i=0;i<rainbow.num;i++){
         var color=rainbow.next();
         $('.popover-color ul.color-sel')
          .append('<li>'+color+'</li>')
          .children(':last')
          .css('background-color',color)
-         .css('color',modcolor(color,70));
+         .css('color',color_utils.modcolor(color,70));
     }
 
     // init scroll-area
@@ -86,8 +86,7 @@ var timer = {
     // device click on small round color-button
     $(".colorsel").on('click tap',function(evt){
       var lastcolor = $(this).css('background-color');
-      var color = rgb_to_hex(lastcolor);
-      console.log(color);
+      var color = color_utils.rgb_to_hex(lastcolor);
       var active = $('.popover-color ul.color-sel > li:contains('+color+')');    
       timer.colorsel_elem=this;
       timer.popover('#popover-color',$(this))
@@ -102,7 +101,7 @@ var timer = {
     $(".popover-color ul.color-sel > li").click(function(){
       var color=$(this).html();
       var group=timer.colorsel_elem.className.split(' ')[1].split('_')[1];
-      var darker=modcolor(color,-25);
+      var darker=color_utils.modcolor(color,-25);
       timer.popover_hide('#popover-color');
       var style = '.vis.timeline .group_'+group+' .item, .bg-group_'+group+' {'
                 + '  background-color:'+color+'; '
@@ -257,7 +256,7 @@ var timer = {
         content: content
       };
       // generate css-classes for group
-      var darker=modcolor(item.color,-25);
+      var darker=color_utils.modcolor(item.color,-25);
       var g=item.id;
       var style = '.vis.timeline .group_'+g+' .item, .bg-group_'+g+' {'
                 + '  background-color:'+item.color+'; '
