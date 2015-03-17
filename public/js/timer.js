@@ -86,7 +86,8 @@ var timer = {
     // device click on small round color-button
     $(".colorsel").on('click tap',function(evt){
       var lastcolor = $(this).css('background-color');
-      var color = rgb2hex(lastcolor);
+      var color = rgb_to_hex(lastcolor);
+      console.log(color);
       var active = $('.popover-color ul.color-sel > li:contains('+color+')');    
       timer.colorsel_elem=this;
       timer.popover('#popover-color',$(this))

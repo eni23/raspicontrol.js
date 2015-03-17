@@ -50,14 +50,29 @@ var modcolor = function (col, amt) {
 }
 
 
+
+/**
+ * Rainbowmaker
+ *
+ * @author Cyrill von Wattenwyl
+ *
+ * @param {int}  Number of Steps
+ * @returns none
+ */
 var rainbow_maker = function(size) {
-  
+
   this.num=100;
   this.step=0;
   this.hue=0;
   this.rotation=360;
   this.divider=60;
 
+  /**
+   * Generates a color from hue
+   *
+   * @param {float} hue   hue to convert
+   * @returns string      hex-color
+   */
   this.color_from_hue = function(hue){
     var h = hue/this.divider;
     var c = 255;
@@ -73,22 +88,39 @@ var rainbow_maker = function(size) {
     return color;
   }
 
+  /**
+   * Generates a color from hue
+   *
+   * @type: main-func
+   * @returns string hex-color
+   */
   this.rgb_to_hex = function(red, green, blue){
     var h = ((red << 16) | (green << 8) | (blue)).toString(16);
     while (h.length < 6) h = '0' + h;
     return '#' + h;
   }
-  
+
+  /**
+   * Get next Color-Step
+   *
+   * @returns string      hex-color
+   */
   this.next = function(){
     this.step = this.rotation / this.num;
     var col = this.color_from_hue(this.hue);
     this.hue += this.step;
     return col;
   }
-  
-  this.getstep = function(steps){
+
+  /**
+   * Get Specific Step of rainbow
+   *
+   * @param {int} stepnum   Step-Number
+   * @returns string        hex-color
+   */
+  this.getstep = function(stepnum){
     var step = this.rotation / this.num;
-    var hue =  (step * steps);
+    var hue =  (step * stepnum);
     return this.color_from_hue(hue);
   }
 
@@ -98,8 +130,18 @@ var rainbow_maker = function(size) {
 
 
 
-var hexDigits = new Array
-        ("0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"); 
+var rgb_to_hex = function(rgb){
+  this.hexdigits = new Array("0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f");
+  this.hex = function(x){
+    return isNaN(x) ? "00" : this.hexdigits[(x - x % 16) / 16] + this.hexdigits[x % 16];
+  }
+  rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+  return "#" + this.hex(rgb[1]) + this.hex(rgb[2]) + this.hex(rgb[3]);
+}
+
+
+/*
+var hexDigits = new Array("0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"); 
 
 //Function to convert hex format to a rgb color
 function rgb2hex(rgb) {
@@ -109,4 +151,4 @@ function rgb2hex(rgb) {
 
 function hex(x) {
   return isNaN(x) ? "00" : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
- }
+ }*/
