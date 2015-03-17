@@ -89,12 +89,15 @@ div.item.box.on, div.item.box.off, div.item.box.toggle {
 	font-family: 'Glyphicons Halflings' ! important;
   background-color: #e0e0e0 ! important;
   border-color: #ccc ! important;
-  font-size: 12px ! important; 
+
+  /*font-size: 12px ! important; 
 	width: 28px ! important;
+  height: 28px ! important;
+  */
+  width: 31px ! important;
   border-radius: 3px ! important;
   border: 1px solid;
   box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
-  line-height: 1.5;
   background-image: linear-gradient(to bottom,#fff 0,#e0e0e0 100%);
   text-shadow: 0 1px 0 #fff;
 }
@@ -122,6 +125,7 @@ div.item.range.duration {
  font-family: 'Glyphicons Halflings' ! important;
  min-width: 24px ! important;
  text-align: center;
+ line-height: 1.5;
  box-shadow: inset 0 3px 5px rgba(0,0,0,.125) ! important;
  border-radius: 3px ! important;
 }
@@ -141,7 +145,7 @@ div.item.range.duration:before, .icon-action-duration:before{
 }
 
 
-.bootstrap-timepicker, .item-form-duration  {
+.bootstrap-timepicker  {
   width: 133px ! important;
 }
 
@@ -165,10 +169,10 @@ h3.popover-title span {
 }
 
 /* mobile */
-#edit-item-addbuton, #edit-item-delbutton {
+#edit-item-addbuton, #edit-item-delbutton, #edit-row-duration{
   min-width: 133px;
 }
-
+.item-form-duration { width: 133px ! important; }
 .edit-item-delarea, .edit-item-addarea {
   margin-top: 18px;
 }

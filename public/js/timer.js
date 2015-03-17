@@ -790,6 +790,7 @@ var timer = {
     timer._popovers[selector]._height=elem.height();
     timer._popovers[selector]._targetwidth=target.width();
     timer._popovers[selector]._targetheight=target.height();
+    timer._popovers[selector]._hidden=false;
   },
 
 
@@ -800,12 +801,26 @@ var timer = {
    * @returns none
    */
   popover_move: function(selector){
+
     var offset = timer._popovers[selector]._target.offset();
+    if (offset.top==0) return;
+
+    if (timer._popovers[selector]._hidden == true){
+      if (offset.left > 86) {
+        timer._popovers[selector].css('visibility','visible');
+        timer._popovers[selector]._hidden = false;
+      }
+      else return;
+    }
     var newpos={
       top: offset.top + (timer._popovers[selector]._targetheight * 2),
       left: offset.left - ( timer._popovers[selector]._width / 2) + ( timer._popovers[selector]._targetwidth * 0.75 ) 
     }
     timer._popovers[selector].offset(newpos);
+    if (offset.left< 86 ) {
+      timer._popovers[selector].css('visibility','hidden');
+      timer._popovers[selector]._hidden=true;
+    }
     return;
   },
 
