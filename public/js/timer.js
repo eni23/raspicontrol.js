@@ -64,15 +64,8 @@ var timer = {
   colorselector_init: function(){
     
     //make colors
-    rainbow = new rainbow_maker();
-    rainbow.num = 110; // number of items
+    rainbow = new rainbow_maker(110);
     for (i=0;i<rainbow.num;i++){
-        // remove last 18% those are repeated colors
-        if (i > ( rainbow.num-((rainbow.num/100 ) * 5)) ) {
-          console.log(i,'last');
-          continue;
-        }
-        console.log('reg',i)
         var color=rainbow.next();
         $('.popover-color ul.color-sel')
          .append('<li>'+color+'</li>')
@@ -93,7 +86,7 @@ var timer = {
     // device click on small round color-button
     $(".colorsel").on('click tap',function(evt){
       var lastcolor = $(this).css('background-color');
-      var color = rgb2hex(lastcolor).toUpperCase()
+      var color = rgb2hex(lastcolor);
       var active = $('.popover-color ul.color-sel > li:contains('+color+')');    
       timer.colorsel_elem=this;
       timer.popover('#popover-color',$(this))
@@ -117,6 +110,7 @@ var timer = {
                 + '}'
                 ;
       $("#_devices-generated-styles").append(style);
+      
       console.log(color);
       // save
       //timer.api.device.color(group,color)
@@ -336,7 +330,10 @@ var timer = {
    * @type event-callback
    * @returns none
    */
-  drag_timeline: function(){ timer.move_open_popover(); },
+  drag_timeline: function(evt){
+    //console.log(moment(evt.start),evt.end); 
+    timer.move_open_popover(); 
+  },
 
 
   /**

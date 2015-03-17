@@ -50,40 +50,52 @@ var modcolor = function (col, amt) {
 }
 
 
-var rainbow_maker = function() {
+var rainbow_maker = function(size) {
   
-  this.num=25;
-  this.act_num=0;
-  this.center=128;
-  this.width=127;
-  this.phase=0;
-  this.factor_red= 30;
-  this.factor_green=6;
-  this.factor_blue=2;
-  this.freq=false;
+  this.num=100;
+  this.step=0;
+  this.hue=0;
+  this.rotation=360;
+  this.divider=60;
 
-  var self = this;
+  this.color_from_hue = function(hue){
+    var h = hue/this.divider;
+    var c = 255;
+    var x = (1 - Math.abs(h%2 - 1))*255;
+    var color;
+    var i = Math.floor(h);
+    if (i == 0) color = this.rgb_to_hex(c, x, 0);
+    else if (i == 1) color = this.rgb_to_hex(x, c, 0);
+    else if (i == 2) color = this.rgb_to_hex(0, c, x);
+    else if (i == 3) color = this.rgb_to_hex(0, x, c);
+    else if (i == 4) color = this.rgb_to_hex(x, 0, c);
+    else color = this.rgb_to_hex(c, 0, x);
+    return color;
+  }
 
-  this.RGB2Color = function(r,g,b){
-    return '#' + this.byte2Hex(r) + this.byte2Hex(g) + this.byte2Hex(b);
-  };
-
-  this.byte2Hex = function(n){
-    var nybHexString = "0123456789ABCDEF";
-    return String(nybHexString.substr((n >> 4) & 0x0F,1)) + nybHexString.substr(n & 0x0F,1);
-  };
-
+  this.rgb_to_hex = function(red, green, blue){
+    var h = ((red << 16) | (green << 8) | (blue)).toString(16);
+    while (h.length < 6) h = '0' + h;
+    return '#' + h;
+  }
+  
   this.next = function(){
-    if (!this.freq) { this.freq = Math.PI*2/this.num; }
-    var i=this.act_num;
-    var red   = Math.sin(this.freq*i+this.factor_red+this.phase) * this.width + this.center;
-    var green = Math.sin(this.freq*i+this.factor_green+this.phase) * this.width + this.center;
-    var blue  = Math.sin(this.freq*i+this.factor_blue+this.phase) * this.width + this.center;
-    this.act_num++;
-    return this.RGB2Color(red,green,blue);
-  };
+    this.step = this.rotation / this.num;
+    var col = this.color_from_hue(this.hue);
+    this.hue += this.step;
+    return col;
+  }
+  
+  this.getstep = function(steps){
+    var step = this.rotation / this.num;
+    var hue =  (step * steps);
+    return this.color_from_hue(hue);
+  }
+
+  if (size > 0) this.num=size;
 
 }
+
 
 
 var hexDigits = new Array
