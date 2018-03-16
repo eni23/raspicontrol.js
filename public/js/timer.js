@@ -199,15 +199,25 @@ var timer = {
     },
 
     save: function(item, cb){
-      var rate=200;
+      var rate=300;
+      clearTimeout(timer.api.save_timeout_last);
       if (timer.api.save_timeout==false){
         timer.api.save_timeout = setTimeout(timer.api.save_cb, rate );
         timer.api.save_action(item, cb);
+      }
+      else {
+        timer.api.save_timeout_last = setTimeout(
+          function(){
+            timer.api.save_action(item, cb);
+          },
+          rate
+        );
       }
       return true;
     },
 
     save_timeout: false,
+    save_timeout_last: false,
 
     save_cb: function(){
       clearTimeout(timer.api.save_timeout);
@@ -215,6 +225,7 @@ var timer = {
     },
 
     save_action: function(item, cb){
+      console.log("save_action");
       var item_tpl = {
           "id": item.id,
           "name": item.origData.name,
@@ -809,8 +820,8 @@ var timer = {
       type: 'box',
       origData:origData
     }
+
     timer.api.add(visItem, function(res){
-      console.log(res);
       if (res.statuscode==200){
         visItem.id = res.data.id;
         if (type=='duration'){
