@@ -2,14 +2,14 @@
  * raspicontrol.js
  * https://github.com/eni23/raspicontrol.js
  *
- * Timer-App GUI 
+ * Timer-App GUI
  * edit timers via rich graphical interface
  *
  * @author  Cyrill von Wattenwyl < eni@e23.ch >
  * @date    2015-03-15
  *
  * @license
- * WHATEVER, MAN 
+ * WHATEVER, MAN
  *
  */
 
@@ -27,7 +27,7 @@ var timer = {
    * @returns none
    */
   init: function(){
-    
+
     // set date to today
     this.set_date_today();
 
@@ -38,7 +38,7 @@ var timer = {
 
 
     // set event hanlers
-    // store click/touch-position for popover:new 
+    // store click/touch-position for popover:new
     $(document).on('click tap',this.update_clickpos);
 
     // edit/new-popover: change type
@@ -62,7 +62,7 @@ var timer = {
 
   // color sel TODO: move to own file
   colorselector_init: function(){
-    
+
     //make colors
     rainbow = new color_utils.rainbow_maker(110);
     for (i=0;i<rainbow.num;i++){
@@ -75,7 +75,7 @@ var timer = {
     }
 
     // init scroll-area
-    $('.popover-color ul.color-sel').slimScroll({ 
+    $('.popover-color ul.color-sel').slimScroll({
       height: 'auto',
       size: 5,
       wheelStep: 1,
@@ -87,7 +87,7 @@ var timer = {
     $(".colorsel").on('click tap',function(evt){
       var lastcolor = $(this).css('background-color');
       var color = color_utils.rgb_to_hex(lastcolor);
-      var active = $('.popover-color ul.color-sel > li:contains('+color+')');    
+      var active = $('.popover-color ul.color-sel > li:contains('+color+')');
       timer.colorsel_elem=this;
       timer.popover('#popover-color',$(this))
       if (active.length==0) return
@@ -110,7 +110,7 @@ var timer = {
                 + '}'
                 ;
       $("#_devices-generated-styles").append(style);
-      
+
       console.log(color);
       // save
       //timer.api.device.color(group,color)
@@ -146,8 +146,32 @@ var timer = {
    *
    */
    api: {
+
+    baseurl: "/api/v1/",
+		apikey: "bar34",
     queue:[],
     call_timeout:false,
+
+    call: function( opts, callback ){
+      if (typeof opts.data === 'undefined'){
+        opts.data = {};
+        opts.data.apikey=false;
+      }
+      opts.data.apikey = this.apikey;
+      $.ajax({
+        url: this.baseurl+opts.url,
+        type: opts.method,
+        data: opts.data,
+        success: function(res) {
+          callback(res);
+        }
+      });
+    },
+
+    setkey: function(key){
+      this.apikey=key;
+    },
+
     clear_rate_callback: function(){
 
     },
@@ -160,18 +184,69 @@ var timer = {
     dequeue: function(){
 
     },
+
     save: function(item){
-      var rate=50;
-      //console.log('api-save');
+      var rate=200;
+      if (timer.api.save_timeout==false){
+        timer.api.save_timeout = setTimeout(timer.api.save_cb, rate );
+        timer.api.save_action(item);
+      }
+      return true;
     },
+
+    save_timeout: false,
+
+    save_cb: function(){
+      clearTimeout(timer.api.save_timeout);
+      timer.api.save_timeout=false;
+    },
+
+    save_action: function(item){
+      var item_tpl = {
+          "id": item.id,
+          "name": item.origData.name,
+          "device": item.origData.device,
+          "type": item.origData.type,
+          "time": moment(item.start).format("HH:mm:ss"),
+          "duration": parseInt(item.origData.duration)
+      }
+      timer.api.call( { url: "switch/"+item.id, method: "put", data: item_tpl },
+        function(res){
+          console.log(res);
+        }
+      );
+    },
+
     add: function(item){
-      var rate=0;
-      //console.log('api-add');
+      var item_tpl = {
+          "id": item.id,
+          "name": item.origData.name,
+          "device": item.origData.device,
+          "type": item.origData.type,
+          "time": moment(item.start).format("HH:mm:ss"),
+          "duration": parseInt(item.origData.duration)
+      }
+      timer.api.call( { url: "switch/", method: "post", data: item_tpl },
+        function(res){
+          console.log(res);
+        }
+      );
     },
+
     delete: function(item){
       var rate=0;
-      //console.log('api-remove');
+      var item_tpl = {
+          "id": item.id,
+      }
+      timer.api.call( { url: "switch/"+item.id, method: "delete" },
+        function(res){
+          console.log(res);
+        }
+      );
     },
+
+
+
   },
 
 
@@ -216,7 +291,7 @@ var timer = {
     this.timeline.on('rangechange',this.drag_timeline);
 
   },
-  
+
   // placeholder for timeline-object
   timeline: false,
 
@@ -224,7 +299,7 @@ var timer = {
   /**
    * render data from api
    *
-   * @param  {object} data      data to render: { devices: [..] , timers: [...] } 
+   * @param  {object} data      data to render: { devices: [..] , timers: [...] }
    * @returns none
    */
   render: function(data){
@@ -281,7 +356,7 @@ var timer = {
         origData:item
       }
       if (item.type=='duration'){
-       var end=moment(timer.today+' '+item.time).add( parseInt(item.duration) , 'seconds').format('HH:mm');
+       var end=moment(timer.today+' '+item.time).add( parseInt(item.duration) , 'seconds').format('HH:mm:ss');
        visItem.end=timer.today+' '+end;
        visItem.type='range';
        visItem.className=item.type+' bg-group_'+item.device;
@@ -331,8 +406,8 @@ var timer = {
    * @returns none
    */
   drag_timeline: function(evt){
-    //console.log(moment(evt.start),evt.end); 
-    timer.move_open_popover(); 
+    //console.log(moment(evt.start),evt.end);
+    timer.move_open_popover();
   },
 
 
@@ -342,7 +417,7 @@ var timer = {
    * @type event-callback
    * @param {visItem} item    visDataset-item which is currently moving
    * @returns {boolean}       allways true
-   */ 
+   */
   drag_item: function(item){
 
     // if type is duration calculate secounds
@@ -355,7 +430,7 @@ var timer = {
 
     // if edit-tooltip is open, update time and move tooltip too
     if ( $("#popover-edit").is(":visible") ) {
-      var newtime=moment(item.start).format('HH:mm');
+      var newtime=moment(item.start).format('HH:mm:ss');
       $("#edit-start").val(newtime);
       $("#popover-edit").data(item)
       // is duration
@@ -388,7 +463,7 @@ var timer = {
    * @param {string} group      the name of the group/deivce
    * @returns {boolean}         allways true
    */
-  // 
+  //
   update_group_background: function(group){
 
     var groupitems=this.get_group_items(group);
@@ -397,7 +472,7 @@ var timer = {
     var delitems=[];
     var groupstr='group_'+group;
 
-    // simulate timer: 
+    // simulate timer:
     // loop over all group items sorted by time and create bg-array
     var is_on=false;
     for (k in sorted){
@@ -423,7 +498,7 @@ var timer = {
         background.push(bgtemplate);
       }
       else if (item.origData.type=='off'){
-        // if 'device' is not turned skip the item 
+        // if 'device' is not turned skip the item
         if (!is_on) continue;
         if (last.end) continue;
         is_on=false;
@@ -431,7 +506,7 @@ var timer = {
       }
 
       else if (item.origData.type=='toggle'){
-        // if 'device' is on, turn off  
+        // if 'device' is on, turn off
         if (is_on){
           last.end=item.start;
           is_on=false;
@@ -452,7 +527,7 @@ var timer = {
 
     }
 
-    // loop over background-array 
+    // loop over background-array
     for (k in background){
       // fix missing end
       if (!background[k].end){
@@ -485,7 +560,7 @@ var timer = {
 
       timer.edit_new_item=false;
       var requested_item=timer.timers.get(evt.items[0]);
-      
+
       // open on secound click
       if (timer.editid===false){
         timer.editid=requested_item;
@@ -500,7 +575,7 @@ var timer = {
       }
 
       var item=timer.timers.get(evt.items[0]);
-      var start=moment(item.start).format('HH:mm');
+      var start=moment(item.start).format('HH:mm:ss');
 
       $("#popover-edit").data(item);
       $("#edit-type-"+item.origData.type).trigger('click');
@@ -526,7 +601,7 @@ var timer = {
     //else if (evt.items.length == 0){
     //  timer.editid=false;
     //  $('#popover-edit').popoverX('hide');
-    //} 
+    //}
 
   },
 
@@ -578,7 +653,7 @@ var timer = {
     timer.update_group_background(item.group);
     timer.timeline.setSelection(item.id);
     timer.popover_recalc("#popover-edit", $(".item.selected > .content").parent() );
-    
+
     timer.api.save(item)
 
     return true;
@@ -595,7 +670,7 @@ var timer = {
   edit_change_form: function(evt){
     // only on edit
     if (timer.edit_new_item) return true;
-    // discard first 2 events 
+    // discard first 2 events
     timer.edit_change_count++;
     if (timer.edit_change_count<3) return;
 
@@ -603,7 +678,7 @@ var timer = {
     var item=$("#popover-edit").data();
 
     if (formid=="edit-duration"){
-      var end = moment(item.start).add( parseInt($(this).val()) , 'seconds').format('HH:mm');
+      var end = moment(item.start).add( parseInt($(this).val()) , 'seconds').format('HH:mm:ss');
       item.end = timer.today + " " + end;
       item.origData.duration = $("#edit-duration").val();
       timer.drag_item(item);
@@ -612,7 +687,7 @@ var timer = {
 
     else if (formid=="edit-start"){
       var dat=moment(timer.today+" "+$("#edit-start").val());
-      item.origData.time = dat.format('HH:mm');
+      item.origData.time = dat.format('HH:mm:ss');
       item.start=dat;
       // only save and update bg, no move, uncomment for move
       //timer.drag_item(item);
@@ -632,7 +707,7 @@ var timer = {
   /**
    * delete item
    * gets called if user clicks delete button on edit popover
-   * 
+   *
    * @type event-callback
    * @returns none
    */
@@ -654,7 +729,8 @@ var timer = {
    * @returns {boolean}       allways false
    */
   new_item: function(evt){
-    var start=moment(evt.start).format('HH:mm');
+    evt.id = timer.generate_objectid();
+    var start=moment(evt.start).format('HH:mm:ss');
     timer.edit_new_item=true;
     $("#edit-popover-title").html('New Item');
     $(".edit-item-delarea").hide();
@@ -666,10 +742,10 @@ var timer = {
     $("#popover-edit").data(evt);
     return false;
   },
-  
+
   // flag for popover
   edit_new_item: false,
-  
+
 
   /**
    * create new item
@@ -684,10 +760,10 @@ var timer = {
 
     // TODO: better type detection
     var type=$(".popover-edit-type label.active").get(0).className.split(' ')[3];
-    
+
     // TODO: get id from api
     var origData={
-      "id": '_new-item-'+timer.lastid,
+      "id": timer.generate_objectid(),
       "device": item.group,
       "type": type,
       "time": $("#edit-start").val(),
@@ -696,7 +772,7 @@ var timer = {
 
     var visItem={
       content:'',
-      id: '_new-item-'+ timer.lastid,
+      id: timer.generate_objectid(),
       start: timer.today + ' ' + $("#edit-start").val(),
       group: item.group,
       className: type,
@@ -705,7 +781,7 @@ var timer = {
     }
 
     if (type=='duration'){
-      var end=moment(timer.today+' '+origData.time).add( parseInt($("#edit-duration").val()) , 'seconds').format('HH:mm');
+      var end=moment(timer.today+' '+origData.time).add( parseInt($("#edit-duration").val()) , 'seconds').format('HH:mm:ss');
       visItem.end=timer.today+' '+end;
       visItem.type='range';
       origData.duration=parseInt($("#edit-duration").val());
@@ -725,7 +801,7 @@ var timer = {
 
   },
 
-  // new item: counter for temporary new id 
+  // new item: counter for temporary new id
   lastid:0,
 
 
@@ -747,14 +823,14 @@ var timer = {
       top: timer.clickpos.top,
       left: timer.clickpos.left - ( elem.width() / 2)
       };
-    } 
+    }
     else {
       var offset=target.offset();
       var newpos={
         top: offset.top + (target.height() * 2),
-        left: offset.left - ( elem.width() / 2) + ( target.width() * 0.75 ) 
+        left: offset.left - ( elem.width() / 2) + ( target.width() * 0.75 )
       }
-    } 
+    }
     if (typeof placement == 'undefined') {
       placement='bottom';
     }
@@ -811,7 +887,7 @@ var timer = {
     }
     var newpos={
       top: offset.top + (timer._popovers[selector]._targetheight * 2),
-      left: offset.left - ( timer._popovers[selector]._width / 2) + ( timer._popovers[selector]._targetwidth * 0.75 ) 
+      left: offset.left - ( timer._popovers[selector]._width / 2) + ( timer._popovers[selector]._targetwidth * 0.75 )
     }
     timer._popovers[selector].offset(newpos);
     if (offset.left< 86 ) {
@@ -835,7 +911,7 @@ var timer = {
 
 
   /**
-   * popover-move-ratelimit 
+   * popover-move-ratelimit
    * speed-optimised, can be called when popup is closed whith time impact
    * rate=action triggered only every n millisecounds
    *
@@ -870,7 +946,7 @@ var timer = {
    * popover-move-ratelimit: really move popup
    *
    * @returns {boolean}       allways true
-   */ 
+   */
   move_open_popover_action: function(){
     if ( $("#popover-edit").is(":visible") && timer.edit_new_item==false ) {
       timer.popover_move("#popover-edit");
@@ -892,7 +968,7 @@ var timer = {
     // is click
     if (evt.pageX && evt.pageX){
       timer.clickpos={ top: evt.pageY, left: evt.pageX };
-    } 
+    }
     // is touch or tap
     else {
       if (typeof evt.originalEvent == 'undefined') return;
@@ -907,7 +983,35 @@ var timer = {
   clickpos: {},
 
 
-}; 
+  // 2018-05-15
+  generate_objectid: function() {
+      var timestamp = (new Date().getTime() / 1000 | 0).toString(16);
+      return timestamp + 'xxxxxxxxxxxxxxxx'.replace(/[x]/g, function() {
+          return (Math.random() * 16 | 0).toString(16);
+      }).toLowerCase();
+  },
+
+
+  dump: function(){
+    items=[];
+    for (item of this.timers.get()){
+      if (item.type != "background"){
+        var item_tpl = {
+          "id": item.id,
+          "name": item.origData.name,
+          "device": item.origData.device,
+          "type": item.origData.type,
+          "time": moment(item.start).format("HH:mm:ss"),
+          "duration": parseInt(item.origData.duration)
+        }
+        items.push(item_tpl);
+      }
+    }
+    return items;
+  }
+
+
+};
 
 
 /**
@@ -915,6 +1019,6 @@ var timer = {
  * TODO: move to requirejs main app file
  **/
 $(document).ready(function () {
-    timer.init();
+    //timer.init();
 });
 // EOF

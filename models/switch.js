@@ -2,7 +2,7 @@ module.exports = {
   schema: {
     "type": "object",
     "id": "/switch",
-    
+
     "properties": {
       "id": {
         "type": "string",
@@ -19,21 +19,21 @@ module.exports = {
         "required": true,
         "enum": [ "on", "off", "toggle", "duration", "duration-toggle" ]
       },
-      
+
       "time": {
         "type": "string",
         "required": true,
         "minLength": 5,
-        "pattern": "^[0-9]{2}:[0-9]{2}$"
+        "pattern": "^[0-9]{2}:[0-9]{2}:[0-9]{2}$" 
       },
-      
+
       "duration": {
         "type": "string",
         "default":"0s"
-        
+
       },
-      
-      
+
+
     },
   }
 }

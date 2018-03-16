@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no;user-scalable=0;">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, user-scalable=0">
     <link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/lib/bootstrap/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="/lib/bootstrap-popover-x/bootstrap-popover-x.css">
@@ -141,130 +141,29 @@
     <script src="/lib/visjs/vis.js"></script>
     <script src="/lib/moment.min.js"></script>
     <script src="/lib/jquery.slimscroll.min.js"></script>
-    
+
     <script src="/js/utils.js"></script>
     <script src="/js/timer.js"></script>
 
 
     <script>
-      var demodata={
-        "timers": [
-          {
-            "id": "a",
-            "name":"l1 on",
-            "device": "d-a",
-            "type": "on",
-            "time": "08:00",
-            "duration": false
-          },
-          {
-            "id": "b", 
-            "name":"l1 off",
-            "device": "d-a",
-            "type": "off",
-            "time": "19:00",
-            "duration": false
-          },
-          {
-            "id": "c",
-            "name":"l2 on",
-            "device": "d-b",
-            "type": "on",
-            "time": "09:00",
-            "duration": false
-          },
-          {
-            "id": "c1",
-            "name":"l2 toggle",
-            "device": "d-b",
-            "type": "toggle",
-            "time": "12:00",
-            "duration": false
-          },
-          {
-            "id": "c2",
-            "name":"l2 toggle2",
-            "device": "d-b",
-            "type": "toggle",
-            "time": "14:00",
-            "duration": false
-          },
-          {
-            "id": "d",
-            "name":"l2 off",
-            "device": "d-b",
-            "type": "off",
-            "time": "18:30",
-            "duration": false
-          },
-          {
-            "id": "e",
-            "device": "d-c",
-            "name":"water1",
-            "type": "duration",
-            "time": "09:40",
-            "duration": 300
-          },
-          {
-            "id": "f",
-            "device": "d-c",
-            "name":"water2",
-            "type": "duration",
-            "time": "15:40",
-            "duration": 200
-          },
-          {
-            "id": "g",
-            "name":"water3",
-            "device": "d-c",
-            "type": "duration",
-            "time": "20:41",
-            "duration": "600"
-          },
-          {
-            "id": "x",
-            "name":"water3",
-            "device": "d-d",
-            "type": "duration",
-            "time": "10:41",
-            "duration": "3600"
-          },
+    
+      timer.api.call( { url: "device", method: "get" },
+        function(res){
+          demodata.devices = res.data;
+          console.log(res.data);
+          timer.api.call( { url: "switch", method: "get" },
+            function(res){
+              console.log(res.data);
+              demodata.timers = res.data;
+              timer.init();
+            }
+          );
+        }
+      );
 
-        ],
-        "devices": [
-          {
-           "id": "d-a",
-           "name": "Lamp 1",
-           "port": 1,
-           "icon": "cog",
-           "color": "#fffa00"
-           },
-           {
-            "id": "d-b",
-            "name": "Lamp 2",
-            "port": 2,
-            "icon": "cog",
-            "color": "#ffde00"
-          },
-          {
-            "id": "d-c",
-            "port": 3,
-            "name": "Water",
-            "icon": "tint",
-            "color": "#0073ff"
-          },
-          {
-            "id": "d-d",
-            "port": 4,
-            "name": "Spray",
-            "icon": "leaf",
-            "color": "#00ff9d"
-          }
-        ],
-      };
     </script>
 
 
   </body>
 </html>
-
