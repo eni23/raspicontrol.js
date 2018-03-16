@@ -26,13 +26,38 @@ var timer = {
    * @type: main-func
    * @returns none
    */
+
   init: function(){
+    var init_data = {}
+    timer.api.call( { url: "device", method: "get" },
+      function(res){
+        init_data.devices = res.data;
+        timer.api.call( { url: "switch", method: "get" },
+          function(res){
+            init_data.timers = res.data;
+            timer.init_gui(init_data);
+          }
+        );
+      }
+    );
+  },
+
+
+  /**
+   * init()
+   * main entry point
+   *
+   * @type: main gui func
+   * @param  {object} data      data from api: { devices: [..] , timers: [...] }
+   * @returns none
+   */
+  init_gui: function(init_data){
 
     // set date to today
     this.set_date_today();
 
     // init timeline & fetch data
-    this.render(demodata);
+    this.render(init_data);
     this.init_timeline();
     this.update_background();
 
@@ -111,9 +136,10 @@ var timer = {
                 ;
       $("#_devices-generated-styles").append(style);
 
-      console.log(color);
-      // save
-      //timer.api.device.color(group,color)
+      timer.api.save_device_color({
+        id: group,
+        color: color
+      });
 
     });
 
@@ -172,24 +198,11 @@ var timer = {
       this.apikey=key;
     },
 
-    clear_rate_callback: function(){
-
-    },
-    run: function(){
-
-    },
-    queue: function(item){
-
-    },
-    dequeue: function(){
-
-    },
-
-    save: function(item){
+    save: function(item, cb){
       var rate=200;
       if (timer.api.save_timeout==false){
         timer.api.save_timeout = setTimeout(timer.api.save_cb, rate );
-        timer.api.save_action(item);
+        timer.api.save_action(item, cb);
       }
       return true;
     },
@@ -201,7 +214,7 @@ var timer = {
       timer.api.save_timeout=false;
     },
 
-    save_action: function(item){
+    save_action: function(item, cb){
       var item_tpl = {
           "id": item.id,
           "name": item.origData.name,
@@ -212,12 +225,14 @@ var timer = {
       }
       timer.api.call( { url: "switch/"+item.id, method: "put", data: item_tpl },
         function(res){
-          console.log(res);
+          if (cb){
+            cb(res);
+          }
         }
       );
     },
 
-    add: function(item){
+    add: function(item, cb ){
       var item_tpl = {
           "id": item.id,
           "name": item.origData.name,
@@ -228,22 +243,37 @@ var timer = {
       }
       timer.api.call( { url: "switch/", method: "post", data: item_tpl },
         function(res){
-          console.log(res);
+          if (cb){
+            cb(res);
+          }
         }
       );
     },
 
-    delete: function(item){
+    delete: function(item, cb){
       var rate=0;
       var item_tpl = {
           "id": item.id,
       }
       timer.api.call( { url: "switch/"+item.id, method: "delete" },
         function(res){
-          console.log(res);
+          if (cb){
+            cb(res);
+          }
         }
       );
     },
+
+    save_device_color: function(obj, cb){
+      timer.api.call( { url: "device/"+obj.id, method: "put",
+                  data: obj },
+        function(res){
+					if (cb){
+            cb(res);
+          }
+        }
+      );
+    }
 
 
 
@@ -779,25 +809,31 @@ var timer = {
       type: 'box',
       origData:origData
     }
+    timer.api.add(visItem, function(res){
+      console.log(res);
+      if (res.statuscode==200){
+        visItem.id = res.data.id;
+        if (type=='duration'){
+          var end=moment(timer.today+' '+origData.time).add( parseInt($("#edit-duration").val()) , 'seconds').format('HH:mm:ss');
+          visItem.end=timer.today+' '+end;
+          visItem.type='range';
+          origData.duration=parseInt($("#edit-duration").val());
+        }
 
-    if (type=='duration'){
-      var end=moment(timer.today+' '+origData.time).add( parseInt($("#edit-duration").val()) , 'seconds').format('HH:mm:ss');
-      visItem.end=timer.today+' '+end;
-      visItem.type='range';
-      origData.duration=parseInt($("#edit-duration").val());
-    }
+        timer.lastid++;
 
-    timer.lastid++;
+        timer.timers.add(visItem);
+        timer.update_group_background(visItem.group);
+        timer.popover_hide("#popover-edit");
+        timer.timeline.setSelection(visItem.id);
 
-    timer.timers.add(visItem);
-    timer.update_group_background(visItem.group);
-    timer.popover_hide("#popover-edit");
-    timer.timeline.setSelection(visItem.id);
+        //timer.api.add(visItem);
+        timer.edit_new_item=false;
+        $("#popover-edit").data(false);
 
-    timer.api.add(visItem);
+      }
+    });
 
-    timer.edit_new_item=false;
-    $("#popover-edit").data(false);
 
   },
 
@@ -1019,6 +1055,6 @@ var timer = {
  * TODO: move to requirejs main app file
  **/
 $(document).ready(function () {
-    //timer.init();
+  timer.init();
 });
 // EOF

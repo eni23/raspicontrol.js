@@ -147,20 +147,7 @@
 
 
     <script>
-    
-      timer.api.call( { url: "device", method: "get" },
-        function(res){
-          demodata.devices = res.data;
-          console.log(res.data);
-          timer.api.call( { url: "switch", method: "get" },
-            function(res){
-              console.log(res.data);
-              demodata.timers = res.data;
-              timer.init();
-            }
-          );
-        }
-      );
+      
 
     </script>
 
